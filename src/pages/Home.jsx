@@ -88,7 +88,7 @@ const Home = () => {
       title: "CFO, TechCorp",
       company: "TechCorp",
       avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b0c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
-      quote: "FinanceTracker transformed our expense management. We reduced processing time by 75% and improved compliance across all departments.",
+      quote: "Spendcinq transformed our expense management. We reduced processing time by 75% and improved compliance across all departments.",
       rating: 5
     },
     {
@@ -444,7 +444,7 @@ const Home = () => {
               Everything you need to manage expenses
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              From receipt scanning to reimbursements, FinanceTracker provides comprehensive tools for modern expense management.
+              From receipt scanning to reimbursements, Spendcinq provides comprehensive tools for modern expense management.
             </p>
           </div>
 
