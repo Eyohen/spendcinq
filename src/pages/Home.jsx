@@ -171,7 +171,7 @@ const Home = () => {
             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
           </div>
           <div className="flex-1 bg-white rounded-md px-3 py-1 text-sm text-gray-500 ml-4">
-            app.financetracker.com/dashboard
+            app.Spendcinq.com/dashboard
           </div>
         </div>
       </div>
@@ -466,7 +466,7 @@ const Home = () => {
                     <div className="space-y-4">
                       <div className="flex items-center">
                         <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                        <span className="text-gray-700">AI-powered automation</span>
+                        <span className="text-gray-700">Precise automation</span>
                       </div>
                       <div className="flex items-center">
                         <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
@@ -503,7 +503,7 @@ const Home = () => {
               Trusted by finance teams worldwide
             </h2>
             <p className="text-xl text-gray-600">
-              See what our customers say about FinanceTracker
+              See what our customers say about Spendcinq
             </p>
           </div>
 
@@ -604,7 +604,7 @@ const Home = () => {
             Ready to transform your expense management?
           </h2>
           <p className="text-xl text-primary-light mb-8 max-w-2xl mx-auto">
-            Join thousands of companies that have streamlined their financial operations with FinanceTracker.
+            Join thousands of companies that have streamlined their financial operations with Spendcinq.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="bg-white text-primary px-8 py-4 rounded-xl hover:bg-gray-100 transition-colors font-semibold text-lg">
@@ -627,7 +627,7 @@ const Home = () => {
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                   <DollarSign className="w-5 h-5 text-white" />
                 </div>
-                <span className="ml-3 text-xl font-bold">FinanceTracker</span>
+                <span className="ml-3 text-xl font-bold">Spendcinq</span>
               </div>
               <p className="text-gray-400 mb-4">
                 Smart expense management for modern businesses. Streamline your financial operations with automation.
@@ -680,7 +680,7 @@ const Home = () => {
           </div>
 
           <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400">© 2025 FinanceTracker. All rights reserved.</p>
+            <p className="text-gray-400">© 2025 Spendcinq. All rights reserved.</p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</a>
               <a href="#" className="text-gray-400 hover:text-white transition-colors">Terms of Service</a>
