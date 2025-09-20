@@ -263,8 +263,8 @@ const SignIn = () => {
           <div className="mt-8 text-center">
             <p className="text-gray-600">
               Don't have an account?{' '}
-              <button className="text-[#b892ff] hover:text-[#a075ff] font-medium">
-                Start free trial
+              <button   onClick={() => navigate('/register')}  className="text-[#b892ff] hover:text-[#a075ff] font-medium">
+                Sign Up
               </button>
             </p>
           </div>

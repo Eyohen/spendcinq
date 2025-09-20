@@ -11,6 +11,7 @@ import Settings from './pages/Settings';
 import Home from './pages/Home';
 import SignIn from './pages/SignIn';
 import Contact from './pages/Contact';
+import Register from './pages/Register';
 // import 'coinley-checkout/dist/style.css'
 
 const App = () => {
@@ -20,6 +21,7 @@ const App = () => {
         {/* Home page without dashboard layout */}
         <Route path="/" element={<Home />} />
         <Route path="/contact" element={<Contact/>} />
+        <Route path="/register" element={<Register/>} />
         <Route path="/sign-in" element={<SignIn/>} />
       
       {/* Dashboard routes with layout */}
