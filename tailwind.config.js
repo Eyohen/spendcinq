@@ -9,7 +9,8 @@ export default {
       fontFamily:{
         // 'bricolage': ['Bricolage Grotesque', 'sans-serif'],
         // 'body': ['Inter', 'sans-serif'],
-           'sans': ['Inter', 'system-ui', 'sans-serif'],
+          //  'sans': ['Inter', 'system-ui', 'sans-serif'],
+           'jakarta': ['Plus Jakarta Sans', 'sans-serif'],
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',

@@ -9,6 +9,8 @@ import Employees from './pages/Employees';
 import Billing from './pages/Billing';
 import Settings from './pages/Settings';
 import Home from './pages/Home';
+import SignIn from './pages/SignIn';
+import Contact from './pages/Contact';
 // import 'coinley-checkout/dist/style.css'
 
 const App = () => {
@@ -16,20 +18,39 @@ const App = () => {
     <>
       <Routes>
         {/* Home page without dashboard layout */}
-        <Route path="/home" element={<Home />} />
-        <Route path="/" element={<Navigate to="/home" replace />} />
-        
-        {/* Dashboard routes with layout */}
-        <Route path="/dashboard/*" element={
+        <Route path="/" element={<Home />} />
+        <Route path="/contact" element={<Contact/>} />
+        <Route path="/sign-in" element={<SignIn/>} />
+      
+      {/* Dashboard routes with layout */}
+        <Route path="/dashboard" element={
           <DashboardLayout>
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/transactions" element={<Transactions />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/employees" element={<Employees />} />
-              <Route path="/billing" element={<Billing />} />
-              <Route path="/settings" element={<Settings />} />
-            </Routes>
+            <Dashboard />
+          </DashboardLayout>
+        } />
+        <Route path="/dashboard/transactions" element={
+          <DashboardLayout>
+            <Transactions />
+          </DashboardLayout>
+        } />
+        <Route path="/dashboard/analytics" element={
+          <DashboardLayout>
+            <Analytics />
+          </DashboardLayout>
+        } />
+        <Route path="/dashboard/employees" element={
+          <DashboardLayout>
+            <Employees />
+          </DashboardLayout>
+        } />
+        <Route path="/dashboard/billing" element={
+          <DashboardLayout>
+            <Billing />
+          </DashboardLayout>
+        } />
+        <Route path="/dashboard/settings" element={
+          <DashboardLayout>
+            <Settings />
           </DashboardLayout>
         } />
       </Routes>

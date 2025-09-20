@@ -1,105 +1,5 @@
 
 // // pages/Dashboard.jsx
-// import React from 'react';
-// import { Clock, TrendingUp, CheckCircle, Users, ArrowUpRight, Plus } from 'lucide-react';
-// import StatsCard from '../components/StatsCard';
-// import TransactionsTable from '../components/TransactionsTable';
-
-// const Dashboard = () => {
-//   const recentTransactions = [
-//     {
-//       id: 1,
-//       employee: 'Sarah Johnson',
-//       amount: 156.80,
-//       category: 'Office Supplies',
-//       date: '2025-09-18',
-//       status: 'pending',
-//       receipt: true
-//     },
-//     {
-//       id: 2,
-//       employee: 'Mike Chen',
-//       amount: 89.50,
-//       category: 'Client Lunch',
-//       date: '2025-09-17',
-//       status: 'approved',
-//       receipt: true
-//     },
-//     {
-//       id: 3,
-//       employee: 'Emma Davis',
-//       amount: 245.00,
-//       category: 'Software License',
-//       date: '2025-09-16',
-//       status: 'reconciled',
-//       receipt: false
-//     },
-//     {
-//       id: 4,
-//       employee: 'James Wilson',
-//       amount: 67.25,
-//       category: 'Transportation',
-//       date: '2025-09-15',
-//       status: 'pending',
-//       receipt: true
-//     }
-//   ];
-
-//   return (
-//     <div className="space-y-6">
-//       {/* Stats Cards */}
-//       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-//         <StatsCard
-//           title="Total Pending"
-//           value="$2,847.50"
-//           subtitle="12 transactions"
-//           icon={Clock}
-//           color="yellow"
-//         />
-//         <StatsCard
-//           title="This Month"
-//           value="$18,456.20"
-//           subtitle={
-//             <span className="text-green-600 flex items-center">
-//               <ArrowUpRight className="w-3 h-3 mr-1" />
-//               +12.5% from last month
-//             </span>
-//           }
-//           icon={TrendingUp}
-//           color="purple"
-//         />
-//         <StatsCard
-//           title="Reconciled"
-//           value="$156,789.40"
-//           subtitle="284 transactions"
-//           icon={CheckCircle}
-//           color="green"
-//         />
-//         <StatsCard
-//           title="Active Employees"
-//           value="47"
-//           subtitle={
-//             <span className="text-blue-600 flex items-center">
-//               <Plus className="w-3 h-3 mr-1" />
-//               3 new this month
-//             </span>
-//           }
-//           icon={Users}
-//           color="blue"
-//         />
-//       </div>
-
-//       {/* Recent Transactions */}
-//       <TransactionsTable transactions={recentTransactions} />
-//     </div>
-//   );
-// };
-
-
-// export default Dashboard
-
-
-
 import React, { useState } from 'react';
 import {
   BarChart,
@@ -378,7 +278,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-jakarta">
       {/* Header Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

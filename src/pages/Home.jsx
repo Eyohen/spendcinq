@@ -29,11 +29,13 @@ import {
   PieChart,
   Activity
 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Home = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
   const [isVisible, setIsVisible] = useState({});
+  const navigate = useNavigate()
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -191,11 +193,11 @@ const Home = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
-          <div className="bg-white p-4 rounded-lg shadow-sm border">
+        <div className="grid grid-cols-4 gap-y-4 gap-x-2 mb-6">
+          <div className="bg-white py-4 px-2 rounded-lg shadow-sm border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Expenses</p>
+                <p className="text-sm text-gray-600 whitespace-nowrap">Total Expenses</p>
                 <p className="text-xl font-bold text-gray-900">$248,567</p>
                 <p className="text-xs text-green-600">+12.5%</p>
               </div>
@@ -204,7 +206,7 @@ const Home = () => {
               </div>
             </div>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm border">
+          <div className="bg-white py-4 px-2 rounded-lg shadow-sm border">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">This Month</p>
@@ -216,7 +218,7 @@ const Home = () => {
               </div>
             </div>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm border">
+          <div className="bg-white py-4 px-2 rounded-lg shadow-sm border">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Pending</p>
@@ -228,16 +230,24 @@ const Home = () => {
               </div>
             </div>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm border">
+          <div className="bg-white py-4 px-2 rounded-lg shadow-sm border">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Reimbursements</p>
+                <div className='flex'>
+                    <div>
                 <p className="text-xl font-bold text-gray-900">$8,934</p>
                 <p className="text-xs text-green-600">23 employees</p>
-              </div>
-              <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                </div>
+                      <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
                 <CreditCard className="w-4 h-4 text-white" />
               </div>
+
+              </div>
+              </div>
+              {/* <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                <CreditCard className="w-4 h-4 text-white" />
+              </div> */}
             </div>
           </div>
         </div>
@@ -272,7 +282,7 @@ const Home = () => {
   );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white font-jakarta">
       {/* Navigation */}
       <nav className="bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -290,9 +300,9 @@ const Home = () => {
               <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
               <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
               <a href="#testimonials" className="text-gray-600 hover:text-gray-900 transition-colors">Customers</a>
-              <a href="#contact" className="text-gray-600 hover:text-gray-900 transition-colors">Contact</a>
-              <button className="text-gray-600 hover:text-gray-900 transition-colors">Sign In</button>
-              <button className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors">
+              <Link to={"/contact"} className="text-gray-600 hover:text-gray-900 transition-colors">Contact</Link>
+              <button onClick={() => navigate('/sign-in')}  className="text-gray-600 hover:text-gray-900 transition-colors">Sign In</button>
+              <button onClick={() => navigate('/dashboard')} className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors">
                 Start Free Trial
               </button>
             </div>
@@ -348,12 +358,12 @@ const Home = () => {
                 Made Simple
               </h1>
               
-              <p className="text-xl text-gray-600 mb-8 max-w-2xl">
+              <p className="text-xl text-gray-600 mb-8 max-w-2xl font-jakarta">
                 Streamline your financial operations with expense tracking, real-time analytics, and automated approval workflows. Join thousands of companies saving time and money.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <button className="bg-primary text px-8 py-4 rounded-xl hover:bg-primary-dark transition-all transform hover:scale-105 flex items-center justify-center text-lg font-semibold shadow-lg">
+                <button  onClick={() => navigate('/dashboard')} className="bg-[#b892ff] text-white px-8 py-4 rounded-xl hover:bg-primary-dark transition-all transform hover:scale-105 flex items-center justify-center text-lg font-semibold shadow-lg">
                   Start Free Trial
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </button>

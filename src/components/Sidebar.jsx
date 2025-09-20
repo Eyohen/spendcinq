@@ -2,13 +2,13 @@
 // components/Sidebar.jsx
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  BarChart3, 
-  CreditCard, 
-  Settings, 
-  Users, 
-  Receipt, 
+import {
+  LayoutDashboard,
+  BarChart3,
+  CreditCard,
+  Settings,
+  Users,
+  Receipt,
   DollarSign,
   User
 } from 'lucide-react';
@@ -16,11 +16,11 @@ import {
 const Sidebar = () => {
   const sidebarItems = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/transactions', label: 'Transactions', icon: Receipt },
-    { path: '/analytics', label: 'Analytics', icon: BarChart3 },
-    { path: '/employees', label: 'Employees', icon: Users },
-    { path: '/billing', label: 'Billing', icon: CreditCard },
-    { path: '/settings', label: 'Settings', icon: Settings },
+    { path: '/dashboard/transactions', label: 'Transactions', icon: Receipt },
+    { path: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
+    { path: '/dashboard/employees', label: 'Employees', icon: Users },
+    { path: '/dashboard/billing', label: 'Billing', icon: CreditCard },
+    { path: '/dashboard/settings', label: 'Settings', icon: Settings },
   ];
 
   return (
@@ -42,13 +42,19 @@ const Sidebar = () => {
               <NavLink
                 key={item.path}
                 to={item.path}
-                className={({ isActive }) =>
-                  `w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
-                    isActive
-                      ? 'bg-[#b892ff] text-white'
+                className={({ isActive }) => {
+
+                  // For dashboard, check exact match
+                  const exactMatch = item.path === '/dashboard'
+                    ? window.location.pathname === '/dashboard'
+                    : isActive;
+
+                  return `w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+                   exactMatch
+                    ? 'bg-[#b892ff] text-white'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                  }`
-                }
+                    }`
+                }}
               >
                 <Icon className="w-5 h-5 mr-3" />
                 {item.label}
