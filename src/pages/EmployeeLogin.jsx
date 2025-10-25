@@ -21,6 +21,8 @@ import {
   Star
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { URL } from '../url';
 
 const EmployeeLogin = () => {
     const navigate = useNavigate()
@@ -63,18 +65,31 @@ const EmployeeLogin = () => {
 
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
-    
-    // Simulate API call
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Employee sign in:', formData);
-      // Handle successful employee sign in here
+      const response = await axios.post(`${URL}/api/auth/employee/login`, {
+        employeeId: formData.employeeId,
+        password: formData.password
+      });
+
+      if (response.data.success) {
+        // Store token and user data
+        localStorage.setItem('access_token', response.data.access_token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+
+        // Navigate to employee portal
+        navigate('/employee-portal');
+      } else {
+        setErrors({ general: response.data.message || 'Login failed. Please try again or contact your manager.' });
+      }
     } catch (error) {
-      setErrors({ general: 'Invalid Employee ID or password. Please try again or contact your manager.' });
+      console.error('Employee sign in error:', error);
+      const message = error.response?.data?.message || 'Invalid Employee ID or password. Please try again or contact your manager.';
+      setErrors({ general: message });
     } finally {
       setIsLoading(false);
     }
@@ -236,7 +251,7 @@ const EmployeeLogin = () => {
 
             {/* Sign In Button */}
             <button
-              onClick={() => navigate('/employee-portal')}
+              onClick={handleSubmit}
               disabled={isLoading}
               className="w-full flex items-center justify-center px-4 py-3 bg-[#b892ff] text-white rounded-lg hover:bg-[#a075ff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#b892ff] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >

@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { URL } from '../url';
 import {
   DollarSign,
   Camera,
@@ -38,6 +40,7 @@ const EmployeePortal = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [uploadedFile, setUploadedFile] = useState(null);
   const [dragActive, setDragActive] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [expenseForm, setExpenseForm] = useState({
     amount: '',
@@ -45,20 +48,174 @@ const EmployeePortal = () => {
     description: '',
     date: '',
     merchant: '',
-    paymentMethod: 'personal',
+    paymentMethod: 'Personal Card',
     notes: ''
   });
 
-  // Mock employee data
-  const employee = {
-    name: 'John Smith',
-    id: 'EMP-001',
-    department: 'Sales',
-    profilePicture: null
+  // Employee data from localStorage
+  const [employee, setEmployee] = useState(null);
+  const [companyId, setCompanyId] = useState(null);
+
+  // Expenses data from API
+  const [expenses, setExpenses] = useState([]);
+  const [stats, setStats] = useState({
+    pendingApproval: 0,
+    thisMonth: 0,
+    reimbursed: 0
+  });
+
+  // Fetch employee transactions on mount
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      setEmployee({
+        name: `${user.firstName} ${user.lastName}`,
+        id: user.employeeId || user.id,
+        department: user.department?.name || 'N/A',
+        profilePicture: null
+      });
+      setCompanyId(user.companyId);
+      fetchTransactions(user.companyId, user.id);
+      fetchReimbursementSummary(user.id);
+    }
+  }, [statusFilter]);
+
+  const fetchTransactions = async (companyId, employeeId) => {
+    const token = localStorage.getItem('access_token');
+    if (!token) return;
+
+    try {
+      setLoading(true);
+
+      let queryString = `?employeeId=${employeeId}`;
+      if (statusFilter !== 'all') queryString += `&status=${statusFilter}`;
+
+      const response = await axios.get(
+        `${URL}/api/transactions/company/${companyId}${queryString}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        const transactions = response.data.transactions.map(t => ({
+          id: t.transactionNumber || t.id,
+          amount: parseFloat(t.amount),
+          category: t.category?.name || 'Uncategorized',
+          description: t.description,
+          date: new Date(t.transactionDate).toISOString().split('T')[0],
+          merchant: t.merchantName,
+          status: t.status,
+          receipt: t.receipts && t.receipts.length > 0,
+          submittedDate: new Date(t.createdAt).toISOString().split('T')[0],
+          paymentMethod: t.paymentMethod
+        }));
+        setExpenses(transactions);
+
+        // Calculate stats
+        const pending = transactions.filter(t => t.status === 'pending').reduce((sum, t) => sum + t.amount, 0);
+        const thisMonth = transactions.filter(t => new Date(t.date).getMonth() === new Date().getMonth()).reduce((sum, t) => sum + t.amount, 0);
+        setStats(prev => ({ ...prev, pendingApproval: pending, thisMonth }));
+      }
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Mock expenses data
-  const expenses = [
+  const fetchReimbursementSummary = async (employeeId) => {
+    const token = localStorage.getItem('access_token');
+    if (!token) return;
+
+    try {
+      const response = await axios.get(
+        `${URL}/api/reimbursements/employee/${employeeId}/summary`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        setStats(prev => ({
+          ...prev,
+          reimbursed: response.data.summary.lastPayment?.amount || 0
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching reimbursement summary:', error);
+    }
+  };
+
+  const handleSubmitExpense = async () => {
+    const token = localStorage.getItem('access_token');
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (!expenseForm.amount || !expenseForm.description) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await axios.post(
+        `${URL}/api/transactions`,
+        {
+          companyId: user.companyId,
+          employeeId: user.id,
+          departmentId: user.department?.id,
+          categoryId: expenseForm.category, // Should be category ID
+          description: expenseForm.description,
+          amount: parseFloat(expenseForm.amount),
+          merchantName: expenseForm.merchant,
+          paymentMethod: expenseForm.paymentMethod,
+          transactionDate: expenseForm.date || new Date().toISOString(),
+          notes: expenseForm.notes
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        // If there's a file, upload the receipt
+        if (uploadedFile) {
+          const formData = new FormData();
+          formData.append('receipt', uploadedFile);
+          formData.append('transactionId', response.data.transaction.id);
+          formData.append('uploadedBy', user.id);
+
+          await axios.post(
+            `${URL}/api/receipts/upload`,
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data'
+              }
+            }
+          );
+        }
+
+        // Reset form and refresh
+        setExpenseForm({
+          amount: '',
+          category: '',
+          description: '',
+          date: '',
+          merchant: '',
+          paymentMethod: 'Personal Card',
+          notes: ''
+        });
+        setUploadedFile(null);
+        setShowSubmitModal(false);
+        fetchTransactions(user.companyId, user.id);
+      }
+    } catch (error) {
+      console.error('Error submitting expense:', error);
+      alert('Failed to submit expense');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Mock data for development
+  const mockExpenses = [
     {
       id: 'EXP-001',
       amount: 156.80,
@@ -167,21 +324,6 @@ const EmployeePortal = () => {
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       handleFileUpload(e.dataTransfer.files);
     }
-  };
-
-  const handleSubmitExpense = () => {
-    console.log('Submitting expense:', expenseForm, uploadedFile);
-    setShowSubmitModal(false);
-    setExpenseForm({
-      amount: '',
-      category: '',
-      description: '',
-      date: '',
-      merchant: '',
-      paymentMethod: 'personal',
-      notes: ''
-    });
-    setUploadedFile(null);
   };
 
   const totalPending = expenses.filter(exp => exp.status === 'pending').reduce((sum, exp) => sum + exp.amount, 0);

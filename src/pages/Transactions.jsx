@@ -14,7 +14,9 @@
 // export default Transactions
 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { URL } from '../url';
 import {
   Search,
   Filter,
@@ -61,9 +63,118 @@ const Transactions = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [showTransactionModal, setShowTransactionModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [companyId, setCompanyId] = useState(null);
 
-  // Mock transaction data
-  const allTransactions = [
+  // Transaction data from API
+  const [allTransactions, setAllTransactions] = useState([]);
+
+  // Fetch transactions on component mount
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user && user.companyId) {
+      setCompanyId(user.companyId);
+      fetchTransactions(user.companyId);
+    }
+  }, [statusFilter, categoryFilter, searchQuery]);
+
+  const fetchTransactions = async (companyId) => {
+    const token = localStorage.getItem('access_token');
+    if (!token || !companyId) return;
+
+    try {
+      setLoading(true);
+
+      let queryParams = [];
+      if (statusFilter !== 'all') queryParams.push(`status=${statusFilter}`);
+      if (categoryFilter !== 'all') queryParams.push(`category=${categoryFilter}`);
+      if (searchQuery) queryParams.push(`search=${searchQuery}`);
+
+      const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
+
+      const response = await axios.get(
+        `${URL}/api/transactions/company/${companyId}${queryString}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        // Map API response to match expected format
+        const transactions = response.data.transactions.map(t => ({
+          id: t.transactionNumber || t.id,
+          employee: t.employee ? `${t.employee.firstName} ${t.employee.lastName}` : 'Unknown',
+          employeeEmail: t.employee?.email || '',
+          department: t.department?.name || 'N/A',
+          amount: parseFloat(t.amount),
+          category: t.category?.name || 'Uncategorized',
+          description: t.description,
+          date: new Date(t.transactionDate).toISOString().split('T')[0],
+          submittedDate: new Date(t.createdAt).toISOString().split('T')[0],
+          approvedDate: t.approvedAt ? new Date(t.approvedAt).toISOString().split('T')[0] : null,
+          status: t.status,
+          receipt: t.receipts && t.receipts.length > 0,
+          merchant: t.merchantName || 'N/A',
+          paymentMethod: t.paymentMethod || 'N/A',
+          billable: t.billable,
+          clientCode: t.clientCode,
+          projectCode: t.projectCode,
+          taxAmount: parseFloat(t.taxAmount) || 0,
+          currency: t.currency,
+          notes: t.notes,
+          rejectionReason: t.rejectionReason
+        }));
+        setAllTransactions(transactions);
+      }
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleApproveTransaction = async (transactionId) => {
+    const token = localStorage.getItem('access_token');
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    try {
+      const response = await axios.patch(
+        `${URL}/api/transactions/${transactionId}/approve`,
+        { approverId: user.id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        fetchTransactions(companyId);
+        setShowTransactionModal(false);
+      }
+    } catch (error) {
+      console.error('Error approving transaction:', error);
+      alert('Failed to approve transaction');
+    }
+  };
+
+  const handleRejectTransaction = async (transactionId, reason) => {
+    const token = localStorage.getItem('access_token');
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    try {
+      const response = await axios.patch(
+        `${URL}/api/transactions/${transactionId}/reject`,
+        { approverId: user.id, rejectionReason: reason },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        fetchTransactions(companyId);
+        setShowTransactionModal(false);
+      }
+    } catch (error) {
+      console.error('Error rejecting transaction:', error);
+      alert('Failed to reject transaction');
+    }
+  };
+
+  // Mock data for development (remove when API is working)
+  const mockTransactions = [
     {
       id: 'TXN-001',
       employee: 'Sarah Johnson',
@@ -247,9 +358,30 @@ const Transactions = () => {
     }
   };
 
-  const handleBulkAction = (action) => {
-    console.log(`Bulk action: ${action}`, selectedTransactions);
-    // Implement bulk actions here
+  const handleBulkAction = async (action) => {
+    const token = localStorage.getItem('access_token');
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (action === 'approve') {
+      try {
+        const response = await axios.patch(
+          `${URL}/api/transactions/bulk/approve`,
+          { transactionIds: selectedTransactions, approverId: user.id },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (response.data.success) {
+          fetchTransactions(companyId);
+          setSelectedTransactions([]);
+        }
+      } catch (error) {
+        console.error('Error bulk approving:', error);
+        alert('Failed to approve transactions');
+      }
+    } else if (action === 'export') {
+      // Export functionality
+      console.log('Exporting transactions:', selectedTransactions);
+    }
   };
 
   const TransactionModal = ({ transaction, onClose }) => {

@@ -15,7 +15,9 @@
 
 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { URL } from '../url';
 import {
   Search,
   Filter,
@@ -59,9 +61,75 @@ const Employees = () => {
   const [showEmployeeModal, setShowEmployeeModal] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [showAddEmployee, setShowAddEmployee] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [companyId, setCompanyId] = useState(null);
 
-  // Mock employee data
-  const allEmployees = [
+  // Employee data from API
+  const [allEmployees, setAllEmployees] = useState([]);
+
+  // Fetch employees on component mount
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user && user.companyId) {
+      setCompanyId(user.companyId);
+      fetchEmployees(user.companyId);
+    }
+  }, [searchQuery, departmentFilter, statusFilter]);
+
+  const fetchEmployees = async (companyId) => {
+    const token = localStorage.getItem('access_token');
+    if (!token || !companyId) return;
+
+    try {
+      setLoading(true);
+
+      let queryParams = [];
+      if (searchQuery) queryParams.push(`search=${searchQuery}`);
+      if (departmentFilter !== 'all') queryParams.push(`department=${departmentFilter}`);
+      if (statusFilter !== 'all') queryParams.push(`status=${statusFilter}`);
+
+      const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
+
+      const response = await axios.get(
+        `${URL}/api/employees/company/${companyId}${queryString}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        const employees = response.data.employees.map(emp => ({
+          id: emp.id,
+          name: `${emp.firstName} ${emp.lastName}`,
+          email: emp.email,
+          phone: emp.phone,
+          department: emp.department?.name || 'N/A',
+          position: emp.position,
+          manager: emp.manager ? `${emp.manager.firstName} ${emp.manager.lastName}` : 'N/A',
+          employeeId: emp.employeeId,
+          status: emp.isActive ? 'active' : 'inactive',
+          startDate: emp.hireDate ? new Date(emp.hireDate).toISOString().split('T')[0] : 'N/A',
+          location: emp.location,
+          totalExpenses: emp.stats?.totalExpenses || 0,
+          monthlyExpenses: emp.stats?.monthlyExpenses || 0,
+          transactionCount: emp.stats?.transactionCount || 0,
+          avgTransaction: emp.stats?.averageTransaction || 0,
+          spendingLimit: emp.monthlySpendingLimit,
+          approvalLimit: emp.approvalLimit,
+          reimbursementMethod: emp.reimbursementMethod,
+          bankName: emp.bankName,
+          accountNumber: emp.accountNumber,
+          performanceRating: emp.performanceRating
+        }));
+        setAllEmployees(employees);
+      }
+    } catch (error) {
+      console.error('Error fetching employees:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Mock data for development
+  const mockEmployees = [
     {
       id: 'EMP-001',
       name: 'Sarah Johnson',

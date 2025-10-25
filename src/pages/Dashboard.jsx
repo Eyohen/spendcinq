@@ -1,6 +1,8 @@
 
 // // pages/Dashboard.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { URL } from '../url';
 import {
   BarChart,
   Bar,
@@ -52,50 +54,126 @@ import {
 const Dashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('30d');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
+  const [loading, setLoading] = useState(true);
+  const [companyId, setCompanyId] = useState(null);
 
   // Financial overview data
-  const financialOverview = {
-    totalExpenses: 248567.80,
-    monthlyExpenses: 18456.20,
-    pendingApprovals: 5673.45,
-    thisMonthGrowth: 12.5,
-    avgTransactionValue: 284.67,
-    totalTransactions: 1247,
-    reimbursementsDue: 8934.20,
-    budgetUtilization: 73.2
-  };
+  const [financialOverview, setFinancialOverview] = useState({
+    totalExpenses: 0,
+    monthlyExpenses: 0,
+    pendingApprovals: 0,
+    thisMonthGrowth: 0,
+    avgTransactionValue: 0,
+    totalTransactions: 0,
+    reimbursementsDue: 0,
+    budgetUtilization: 0
+  });
 
   // Monthly expense trend data
-  const monthlyTrends = [
-    { month: 'Jan', expenses: 12450, budget: 15000, approved: 11200, pending: 1250, reimbursed: 10800 },
-    { month: 'Feb', expenses: 15680, budget: 16000, approved: 14100, pending: 1580, reimbursed: 13200 },
-    { month: 'Mar', expenses: 18920, budget: 20000, approved: 17200, pending: 1720, reimbursed: 16100 },
-    { month: 'Apr', expenses: 16750, budget: 18000, approved: 15400, pending: 1350, reimbursed: 14800 },
-    { month: 'May', expenses: 21340, budget: 22000, approved: 19800, pending: 1540, reimbursed: 18900 },
-    { month: 'Jun', expenses: 19580, budget: 21000, approved: 18200, pending: 1380, reimbursed: 17600 },
-    { month: 'Jul', expenses: 23150, budget: 24000, approved: 21900, pending: 1250, reimbursed: 21200 },
-    { month: 'Aug', expenses: 25670, budget: 26000, approved: 24100, pending: 1570, reimbursed: 23400 },
-    { month: 'Sep', expenses: 18456, budget: 25000, approved: 16890, pending: 1566, reimbursed: 16200 }
-  ];
+  const [monthlyTrends, setMonthlyTrends] = useState([]);
 
   // Department spending data
-  const departmentData = [
-    { name: 'Sales', amount: 85420, budget: 95000, utilization: 89.9, transactions: 245, color: '#b892ff' },
-    { name: 'Marketing', amount: 67890, budget: 75000, utilization: 90.5, transactions: 189, color: '#8b5cf6' },
-    { name: 'Engineering', amount: 54320, budget: 80000, utilization: 67.9, transactions: 156, color: '#a78bfa' },
-    { name: 'Operations', amount: 32150, budget: 45000, utilization: 71.4, transactions: 98, color: '#c4b5fd' },
-    { name: 'HR', amount: 18750, budget: 25000, utilization: 75.0, transactions: 67, color: '#ddd6fe' }
-  ];
+  const [departmentData, setDepartmentData] = useState([]);
 
   // Category breakdown data
-  const categoryData = [
-    { name: 'Travel & Transport', value: 35.2, amount: 87450, color: '#b892ff', trend: 5.2 },
-    { name: 'Office Supplies', value: 22.8, amount: 56780, color: '#8b5cf6', trend: -2.1 },
-    { name: 'Software & Tools', value: 18.5, amount: 46120, color: '#a78bfa', trend: 8.7 },
-    { name: 'Client Entertainment', value: 12.3, amount: 30650, color: '#c4b5fd', trend: -1.5 },
-    { name: 'Equipment', value: 8.7, amount: 21670, color: '#ddd6fe', trend: 3.2 },
-    { name: 'Other', value: 2.5, amount: 6230, color: '#f3f4f6', trend: 0.8 }
-  ];
+  const [categoryData, setCategoryData] = useState([]);
+
+  // Fetch data on component mount
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user && user.companyId) {
+      setCompanyId(user.companyId);
+      fetchDashboardData(user.companyId);
+    }
+  }, []);
+
+  const fetchDashboardData = async (companyId) => {
+    const token = localStorage.getItem('access_token');
+    if (!token || !companyId) return;
+
+    try {
+      setLoading(true);
+
+      // Fetch dashboard analytics
+      const analyticsResponse = await axios.get(
+        `${URL}/api/dashboard/${companyId}/analytics`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (analyticsResponse.data.success) {
+        const analytics = analyticsResponse.data.analytics;
+        setFinancialOverview({
+          totalExpenses: analytics.totalExpenses || 0,
+          monthlyExpenses: analytics.thisMonthExpenses || 0,
+          pendingApprovals: analytics.pendingApprovals || 0,
+          reimbursementsDue: analytics.reimbursementsDue || 0,
+          totalTransactions: analytics.pendingCount || 0,
+          thisMonthGrowth: 0,
+          avgTransactionValue: 0,
+          budgetUtilization: 0
+        });
+      }
+
+      // Fetch monthly trends
+      const trendsResponse = await axios.get(
+        `${URL}/api/dashboard/${companyId}/trends?months=9`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (trendsResponse.data.success) {
+        const trends = trendsResponse.data.trends.map(t => ({
+          month: t.month,
+          expenses: t.amount,
+          budget: t.amount * 1.2,
+          approved: t.amount * 0.9,
+          pending: t.amount * 0.1,
+          reimbursed: t.amount * 0.85
+        }));
+        setMonthlyTrends(trends);
+      }
+
+      // Fetch category breakdown
+      const categoriesResponse = await axios.get(
+        `${URL}/api/dashboard/${companyId}/categories`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (categoriesResponse.data.success) {
+        const total = categoriesResponse.data.breakdown.reduce((sum, cat) => sum + cat.amount, 0);
+        const categories = categoriesResponse.data.breakdown.map((cat, idx) => ({
+          name: cat.name,
+          value: total > 0 ? (cat.amount / total) * 100 : 0,
+          amount: cat.amount,
+          color: cat.color || ['#b892ff', '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe', '#f3f4f6'][idx % 6],
+          trend: 0
+        }));
+        setCategoryData(categories);
+      }
+
+      // Fetch department budgets
+      const departmentsResponse = await axios.get(
+        `${URL}/api/dashboard/${companyId}/departments`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (departmentsResponse.data.success) {
+        const departments = departmentsResponse.data.departments.map((dept, idx) => ({
+          name: dept.department,
+          amount: dept.spent,
+          budget: dept.budget,
+          utilization: dept.utilization,
+          transactions: 0,
+          color: ['#b892ff', '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe'][idx % 5]
+        }));
+        setDepartmentData(departments);
+      }
+
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Daily activity data
   const dailyActivity = [

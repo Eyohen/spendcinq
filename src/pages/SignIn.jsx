@@ -20,6 +20,8 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { URL } from '../url';
 
 
 const SignIn = () => {
@@ -67,18 +69,31 @@ const SignIn = () => {
 
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
-    
-    // Simulate API call
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Sign in attempt:', formData);
-      // Handle successful sign in here
+      const response = await axios.post(`${URL}/api/auth/admin/login`, {
+        email: formData.email,
+        password: formData.password
+      });
+
+      if (response.data.success) {
+        // Store token and user data
+        localStorage.setItem('access_token', response.data.access_token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+
+        // Navigate to dashboard
+        navigate('/dashboard');
+      } else {
+        setErrors({ general: response.data.message || 'Login failed. Please try again.' });
+      }
     } catch (error) {
-      setErrors({ general: 'Invalid email or password. Please try again.' });
+      console.error('Sign in error:', error);
+      const message = error.response?.data?.message || 'Invalid email or password. Please try again.';
+      setErrors({ general: message });
     } finally {
       setIsLoading(false);
     }
@@ -243,8 +258,7 @@ const SignIn = () => {
 
             {/* Sign In Button */}
             <button
-            //   onClick={handleSubmit}
-            onClick={() => navigate('/dashboard')} 
+              onClick={handleSubmit}
               disabled={isLoading}
               className="w-full flex items-center justify-center px-4 py-3 bg-[#b892ff] text-white rounded-lg hover:bg-[#a075ff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#b892ff] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >

@@ -29,6 +29,8 @@ import {
   Target
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { URL } from '../url';
 
 const Register = () => {
   const navigate = useNavigate()
@@ -41,7 +43,7 @@ const Register = () => {
     password: '',
     confirmPassword: '',
     agreeToTerms: false,
-    
+
     // Step 2: Company Info
     companyName: '',
     industry: '',
@@ -49,20 +51,22 @@ const Register = () => {
     role: '',
     phone: '',
     country: '',
-    
+
     // Step 3: General Ledger
     useTemplate: 'default', // 'default', 'upload', 'skip'
     uploadedFile: null,
-    
+
     // Step 4: Plan Selection
     selectedPlan: 'professional'
   });
-  
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [dragActive, setDragActive] = useState(false);
+  const [accessToken, setAccessToken] = useState(null);
+  const [companyId, setCompanyId] = useState(null);
 
   const totalSteps = 4;
 
@@ -112,8 +116,44 @@ const Register = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const nextStep = () => {
-    if (validateStep(currentStep)) {
+  const nextStep = async () => {
+    if (!validateStep(currentStep)) return;
+
+    // Step 2 completion triggers company registration
+    if (currentStep === 2) {
+      setIsLoading(true);
+      try {
+        const response = await axios.post(`${URL}/api/onboarding/register`, {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+          companyName: formData.companyName,
+          industry: formData.industry,
+          companySize: formData.companySize,
+          role: formData.role,
+          phone: formData.phone,
+          country: formData.country
+        });
+
+        if (response.data.success) {
+          // Store token and company ID for subsequent steps
+          setAccessToken(response.data.access_token);
+          setCompanyId(response.data.company.id);
+          localStorage.setItem('access_token', response.data.access_token);
+
+          setCurrentStep(prev => Math.min(prev + 1, totalSteps));
+        } else {
+          setErrors({ general: response.data.message || 'Registration failed' });
+        }
+      } catch (error) {
+        console.error('Registration error:', error);
+        const message = error.response?.data?.message || 'Registration failed. Please try again.';
+        setErrors({ general: message });
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
       setCurrentStep(prev => Math.min(prev + 1, totalSteps));
     }
   };
@@ -169,16 +209,79 @@ const Register = () => {
 
   const handleSubmit = async () => {
     if (!validateStep(currentStep)) return;
-    
+
     setIsLoading(true);
-    
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Registration complete:', formData);
-      // Redirect to dashboard or success page
+      if (currentStep === 3) {
+        // Step 3: Setup General Ledger
+        const token = accessToken || localStorage.getItem('access_token');
+
+        let ledgerPayload = {
+          companyId: companyId,
+          useTemplate: formData.useTemplate
+        };
+
+        // If uploading custom file, parse it (in real app, you'd parse Excel/CSV to JSON)
+        if (formData.useTemplate === 'upload' && formData.uploadedFile) {
+          // For now, we'll send a placeholder. In production, you'd parse the file
+          ledgerPayload.ledgerData = []; // Parse Excel/CSV to array of ledger entries
+          alert('Note: File parsing not implemented in this demo. Using default template.');
+          ledgerPayload.useTemplate = 'default';
+        }
+
+        const response = await axios.post(
+          `${URL}/api/onboarding/general-ledger`,
+          ledgerPayload,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (response.data.success) {
+          setCurrentStep(4);
+        } else {
+          setErrors({ general: response.data.message });
+        }
+      } else if (currentStep === 4) {
+        // Step 4: Select Plan and Complete Onboarding
+        const token = accessToken || localStorage.getItem('access_token');
+
+        // Map plan IDs to proper names
+        const planMap = {
+          'starter': 'Starter',
+          'professional': 'Professional',
+          'enterprise': 'Enterprise'
+        };
+
+        const response = await axios.post(
+          `${URL}/api/onboarding/plan`,
+          {
+            companyId: companyId,
+            plan: planMap[formData.selectedPlan]
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (response.data.success) {
+          // Store user data
+          const userResponse = await axios.get(
+            `${URL}/api/auth/admin/profile`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          if (userResponse.data.success) {
+            localStorage.setItem('user', JSON.stringify(userResponse.data.user));
+          }
+
+          // Navigate to dashboard
+          navigate('/dashboard');
+        } else {
+          setErrors({ general: response.data.message });
+        }
+      }
     } catch (error) {
-      setErrors({ general: 'Registration failed. Please try again.' });
+      console.error('Onboarding error:', error);
+      const message = error.response?.data?.message || 'An error occurred. Please try again.';
+      setErrors({ general: message });
     } finally {
       setIsLoading(false);
     }
