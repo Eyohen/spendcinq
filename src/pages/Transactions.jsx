@@ -63,6 +63,8 @@ const Transactions = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [showTransactionModal, setShowTransactionModal] = useState(false);
+  const [showReceiptModal, setShowReceiptModal] = useState(false);
+  const [selectedReceipt, setSelectedReceipt] = useState(null);
   const [loading, setLoading] = useState(false);
   const [companyId, setCompanyId] = useState(null);
 
@@ -101,6 +103,7 @@ const Transactions = () => {
         // Map API response to match expected format
         const transactions = response.data.transactions.map(t => ({
           id: t.transactionNumber || t.id,
+          transactionId: t.id, // Store actual UUID for API calls
           employee: t.employee ? `${t.employee.firstName} ${t.employee.lastName}` : 'Unknown',
           employeeEmail: t.employee?.email || '',
           department: t.department?.name || 'N/A',
@@ -112,6 +115,7 @@ const Transactions = () => {
           approvedDate: t.approvedAt ? new Date(t.approvedAt).toISOString().split('T')[0] : null,
           status: t.status,
           receipt: t.receipts && t.receipts.length > 0,
+          receipts: t.receipts || [], // Store full receipt data
           merchant: t.merchantName || 'N/A',
           paymentMethod: t.paymentMethod || 'N/A',
           billable: t.billable,
@@ -135,7 +139,14 @@ const Transactions = () => {
     const token = localStorage.getItem('access_token');
     const user = JSON.parse(localStorage.getItem('user'));
 
+    if (!transactionId) {
+      alert('Error: Transaction ID is missing');
+      return;
+    }
+
     try {
+      console.log('Approving transaction:', transactionId);
+
       const response = await axios.patch(
         `${URL}/api/transactions/${transactionId}/approve`,
         { approverId: user.id },
@@ -143,12 +154,20 @@ const Transactions = () => {
       );
 
       if (response.data.success) {
+        alert('Transaction approved successfully!');
         fetchTransactions(companyId);
         setShowTransactionModal(false);
+        setSelectedTransaction(null);
+      } else {
+        alert(response.data.message || 'Failed to approve transaction');
       }
     } catch (error) {
       console.error('Error approving transaction:', error);
-      alert('Failed to approve transaction');
+      const errorMessage = error.response?.data?.message
+        || error.response?.data?.error
+        || error.message
+        || 'Failed to approve transaction';
+      alert(`Error: ${errorMessage}`);
     }
   };
 
@@ -156,7 +175,14 @@ const Transactions = () => {
     const token = localStorage.getItem('access_token');
     const user = JSON.parse(localStorage.getItem('user'));
 
+    if (!transactionId) {
+      alert('Error: Transaction ID is missing');
+      return;
+    }
+
     try {
+      console.log('Rejecting transaction:', transactionId, 'Reason:', reason);
+
       const response = await axios.patch(
         `${URL}/api/transactions/${transactionId}/reject`,
         { approverId: user.id, rejectionReason: reason },
@@ -164,12 +190,20 @@ const Transactions = () => {
       );
 
       if (response.data.success) {
+        alert('Transaction rejected successfully!');
         fetchTransactions(companyId);
         setShowTransactionModal(false);
+        setSelectedTransaction(null);
+      } else {
+        alert(response.data.message || 'Failed to reject transaction');
       }
     } catch (error) {
       console.error('Error rejecting transaction:', error);
-      alert('Failed to reject transaction');
+      const errorMessage = error.response?.data?.message
+        || error.response?.data?.error
+        || error.message
+        || 'Failed to reject transaction';
+      alert(`Error: ${errorMessage}`);
     }
   };
 
@@ -344,7 +378,8 @@ const Transactions = () => {
 
   const handleSelectAll = (checked) => {
     if (checked) {
-      setSelectedTransactions(allTransactions.map(t => t.id));
+      // Use transactionId (UUID) for API calls, not id (transaction number)
+      setSelectedTransactions(allTransactions.map(t => t.transactionId));
     } else {
       setSelectedTransactions([]);
     }
@@ -362,8 +397,19 @@ const Transactions = () => {
     const token = localStorage.getItem('access_token');
     const user = JSON.parse(localStorage.getItem('user'));
 
+    if (selectedTransactions.length === 0) {
+      alert('Please select at least one transaction');
+      return;
+    }
+
     if (action === 'approve') {
+      if (!confirm(`Approve ${selectedTransactions.length} transaction(s)?`)) {
+        return;
+      }
+
       try {
+        console.log('Bulk approving transactions:', selectedTransactions);
+
         const response = await axios.patch(
           `${URL}/api/transactions/bulk/approve`,
           { transactionIds: selectedTransactions, approverId: user.id },
@@ -371,17 +417,120 @@ const Transactions = () => {
         );
 
         if (response.data.success) {
+          alert(`Successfully approved ${selectedTransactions.length} transaction(s)!`);
           fetchTransactions(companyId);
           setSelectedTransactions([]);
+        } else {
+          alert(response.data.message || 'Failed to approve transactions');
         }
       } catch (error) {
         console.error('Error bulk approving:', error);
-        alert('Failed to approve transactions');
+        const errorMessage = error.response?.data?.message
+          || error.response?.data?.error
+          || error.message
+          || 'Failed to approve transactions';
+        alert(`Error: ${errorMessage}`);
       }
+    } else if (action === 'reject') {
+      const reason = prompt('Enter rejection reason for all selected transactions:');
+      if (reason === null) return; // User cancelled
+
+      alert('Bulk reject functionality coming soon!');
     } else if (action === 'export') {
       // Export functionality
       console.log('Exporting transactions:', selectedTransactions);
+      alert('Export functionality coming soon!');
     }
+  };
+
+  // Receipt Modal Component
+  const ReceiptModal = ({ receipt, onClose }) => {
+    if (!receipt) return null;
+
+    const isImage = receipt.fileType?.startsWith('image/') || receipt.fileName?.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+    const isPDF = receipt.fileType === 'application/pdf' || receipt.fileName?.endsWith('.pdf');
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+          {/* Modal Header */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-200">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Receipt Viewer</h2>
+              <p className="text-sm text-gray-500">{receipt.fileName || 'Receipt'}</p>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Modal Content */}
+          <div className="flex-1 overflow-auto p-4 bg-gray-100">
+            {isImage ? (
+              <div className="flex items-center justify-center min-h-full">
+                <img
+                  src={receipt.fileUrl}
+                  alt={receipt.fileName || 'Receipt'}
+                  className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><text x="50%" y="50%" text-anchor="middle" dy=".3em">Failed to load image</text></svg>';
+                  }}
+                />
+              </div>
+            ) : isPDF ? (
+              <iframe
+                src={receipt.fileUrl}
+                className="w-full h-full min-h-[600px] rounded-lg shadow-lg"
+                title={receipt.fileName || 'Receipt PDF'}
+              />
+            ) : (
+              <div className="text-center py-12">
+                <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 mb-4">Unable to preview this file type</p>
+                <a
+                  href={receipt.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-4 py-2 bg-[#b892ff] text-white rounded-lg hover:bg-[#a075ff] transition-colors"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download Receipt
+                </a>
+              </div>
+            )}
+          </div>
+
+          {/* Modal Footer */}
+          <div className="flex items-center justify-between p-4 border-t border-gray-200 bg-white">
+            <div className="text-sm text-gray-600">
+              {receipt.fileSize && `Size: ${(receipt.fileSize / 1024).toFixed(2)} KB`}
+              {receipt.fileSize && receipt.fileType && ' • '}
+              {receipt.fileType && `Type: ${receipt.fileType}`}
+            </div>
+            <div className="flex items-center space-x-3">
+              <a
+                href={receipt.fileUrl}
+                download={receipt.fileName}
+                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download
+              </a>
+              <button
+                onClick={onClose}
+                className="px-4 py-2 bg-[#b892ff] text-white rounded-lg hover:bg-[#a075ff] transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const TransactionModal = ({ transaction, onClose }) => {
@@ -514,18 +663,29 @@ const Transactions = () => {
             {/* Receipt */}
             <div className="border-t pt-6">
               <h3 className="text-lg font-medium text-gray-900 mb-4">Receipt</h3>
-              {transaction.receipt ? (
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div className="flex items-center">
-                    <Paperclip className="w-5 h-5 text-gray-400 mr-3" />
-                    <div>
-                      <p className="font-medium text-gray-900">Receipt.pdf</p>
-                      <p className="text-sm text-gray-500">Uploaded on {transaction.submittedDate}</p>
+              {transaction.receipts && transaction.receipts.length > 0 ? (
+                <div className="space-y-3">
+                  {transaction.receipts.map((receipt, index) => (
+                    <div key={receipt.id || index} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                      <div className="flex items-center">
+                        <Paperclip className="w-5 h-5 text-gray-400 mr-3" />
+                        <div>
+                          <p className="font-medium text-gray-900">{receipt.fileName || `Receipt ${index + 1}`}</p>
+                          <p className="text-sm text-gray-500">Uploaded on {transaction.submittedDate}</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setSelectedReceipt(receipt);
+                          setShowReceiptModal(true);
+                        }}
+                        className="text-[#b892ff] hover:text-[#a075ff] font-medium flex items-center"
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        View Receipt
+                      </button>
                     </div>
-                  </div>
-                  <button className="text-[#b892ff] hover:text-[#a075ff] font-medium">
-                    View Receipt
-                  </button>
+                  ))}
                 </div>
               ) : (
                 <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
@@ -549,10 +709,25 @@ const Transactions = () => {
             </button>
             {transaction.status === 'pending' && (
               <>
-                <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                <button
+                  onClick={() => {
+                    const reason = prompt('Enter rejection reason (optional):');
+                    if (reason !== null) {
+                      handleRejectTransaction(transaction.transactionId, reason || 'No reason provided');
+                    }
+                  }}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                >
                   Reject
                 </button>
-                <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                <button
+                  onClick={() => {
+                    if (confirm(`Approve this transaction for $${transaction.amount}?`)) {
+                      handleApproveTransaction(transaction.transactionId);
+                    }
+                  }}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
                   Approve
                 </button>
               </>
@@ -740,8 +915,8 @@ const Transactions = () => {
                   <td className="px-6 py-4">
                     <input
                       type="checkbox"
-                      checked={selectedTransactions.includes(transaction.id)}
-                      onChange={(e) => handleSelectTransaction(transaction.id, e.target.checked)}
+                      checked={selectedTransactions.includes(transaction.transactionId)}
+                      onChange={(e) => handleSelectTransaction(transaction.transactionId, e.target.checked)}
                       className="rounded border-gray-300 text-[#b892ff] focus:ring-[#b892ff]"
                     />
                   </td>
@@ -867,6 +1042,17 @@ const Transactions = () => {
           onClose={() => {
             setShowTransactionModal(false);
             setSelectedTransaction(null);
+          }}
+        />
+      )}
+
+      {/* Receipt Viewer Modal */}
+      {showReceiptModal && (
+        <ReceiptModal
+          receipt={selectedReceipt}
+          onClose={() => {
+            setShowReceiptModal(false);
+            setSelectedReceipt(null);
           }}
         />
       )}

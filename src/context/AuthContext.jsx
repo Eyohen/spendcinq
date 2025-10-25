@@ -31,13 +31,23 @@ export const AuthProvider = ({ children }) => {
           
           // Verify token is still valid by making a request to get profile
           try {
-            const response = await axios.get(`${URL}/api/coaches/profile/me`, {
+            // Determine profile endpoint based on user type
+            const isEmployee = userData.employeeId || userData.role === 'employee';
+            const profileEndpoint = isEmployee
+              ? `${URL}/api/auth/employee/profile`
+              : `${URL}/api/auth/admin/profile`;
+
+            const response = await axios.get(profileEndpoint, {
               headers: { Authorization: `Bearer ${token}` }
             });
-            
+
             if (response.data.success) {
-              setUser(userData);
+              // Update user with fresh data from API
+              const freshUserData = response.data.user || response.data.employee || response.data.admin;
+              setUser(freshUserData);
               setIsAuthenticated(true);
+              // Update localStorage with fresh data
+              localStorage.setItem('user', JSON.stringify(freshUserData));
             } else {
               // Token invalid, clear storage
               localStorage.removeItem('user');

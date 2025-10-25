@@ -15,7 +15,7 @@
 
 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   User,
   Lock,
@@ -64,6 +64,7 @@ import {
 } from 'lucide-react';
 
 const Settings = () => {
+  const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('general');
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [showApiKeys, setShowApiKeys] = useState(false);
@@ -75,6 +76,13 @@ const Settings = () => {
   });
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   const settingsTabs = [
     { id: 'general', label: 'General', icon: User },
@@ -215,15 +223,17 @@ const Settings = () => {
         <div className="flex items-center mb-6">
           <div className="relative">
             <div className="w-20 h-20 bg-gradient-to-r from-[#b892ff] to-[#8b5cf6] rounded-full flex items-center justify-center text-white font-bold text-2xl">
-              JD
+              {user ? `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`.toUpperCase() : 'U'}
             </div>
             <button className="absolute bottom-0 right-0 w-6 h-6 bg-gray-600 rounded-full flex items-center justify-center text-white hover:bg-gray-700 transition-colors">
               <Camera className="w-3 h-3" />
             </button>
           </div>
           <div className="ml-4">
-            <h4 className="font-semibold text-gray-900">John Doe</h4>
-            <p className="text-gray-500">Admin</p>
+            <h4 className="font-semibold text-gray-900">
+              {user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : 'Loading...'}
+            </h4>
+            <p className="text-gray-500">{user?.role === 'employee' ? 'Employee' : 'Admin'}</p>
             <button className="text-[#b892ff] hover:text-[#a075ff] text-sm font-medium mt-1">
               Change Photo
             </button>
@@ -235,7 +245,7 @@ const Settings = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
             <input
               type="text"
-              defaultValue="John"
+              defaultValue={user?.firstName || ''}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
             />
           </div>
@@ -243,7 +253,7 @@ const Settings = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
             <input
               type="text"
-              defaultValue="Doe"
+              defaultValue={user?.lastName || ''}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
             />
           </div>
@@ -251,7 +261,7 @@ const Settings = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
             <input
               type="email"
-              defaultValue="john.doe@company.com"
+              defaultValue={user?.email || ''}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
             />
           </div>
@@ -259,7 +269,7 @@ const Settings = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
             <input
               type="tel"
-              defaultValue="+1 (555) 123-4567"
+              defaultValue={user?.phone || ''}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
             />
           </div>

@@ -78,6 +78,11 @@ const Dashboard = () => {
   // Category breakdown data
   const [categoryData, setCategoryData] = useState([]);
 
+  // Recent transactions and approval queue
+  const [recentTransactions, setRecentTransactions] = useState([]);
+  const [approvalQueue, setApprovalQueue] = useState([]);
+  const [dailyActivity, setDailyActivity] = useState([]);
+
   // Fetch data on component mount
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -168,108 +173,46 @@ const Dashboard = () => {
         setDepartmentData(departments);
       }
 
+      // Fetch recent transactions
+      const recentResponse = await axios.get(
+        `${URL}/api/dashboard/${companyId}/recent`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (recentResponse.data.success) {
+        const recent = recentResponse.data.transactions.map(t => ({
+          id: t.transactionNumber || t.id,
+          employee: `${t.employee?.firstName || ''} ${t.employee?.lastName || ''}`.trim() || 'N/A',
+          department: t.department?.name || 'N/A',
+          amount: parseFloat(t.amount),
+          category: t.category?.name || 'Uncategorized',
+          date: new Date(t.transactionDate).toISOString().split('T')[0],
+          status: t.status,
+          urgency: 'normal'
+        }));
+        setRecentTransactions(recent);
+
+        // Filter pending transactions for approval queue
+        const pending = recent
+          .filter(t => t.status === 'pending')
+          .map(t => ({
+            id: t.id,
+            employee: t.employee,
+            amount: t.amount,
+            category: t.category,
+            submitDate: t.date,
+            daysWaiting: Math.floor((new Date() - new Date(t.date)) / (1000 * 60 * 60 * 24)),
+            priority: t.amount > 1000 ? 'high' : t.amount > 500 ? 'medium' : 'low'
+          }));
+        setApprovalQueue(pending);
+      }
+
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
       setLoading(false);
     }
   };
-
-  // Daily activity data
-  const dailyActivity = [
-    { day: 'Mon', submitted: 23, approved: 18, rejected: 2, amount: 4567 },
-    { day: 'Tue', submitted: 31, approved: 24, rejected: 3, amount: 6789 },
-    { day: 'Wed', submitted: 28, approved: 22, rejected: 1, amount: 5234 },
-    { day: 'Thu', submitted: 34, approved: 29, rejected: 2, amount: 7891 },
-    { day: 'Fri', submitted: 26, approved: 21, rejected: 1, amount: 5123 },
-    { day: 'Sat', submitted: 12, approved: 10, rejected: 0, amount: 2345 },
-    { day: 'Sun', submitted: 8, approved: 6, rejected: 0, amount: 1567 }
-  ];
-
-  // Recent transactions
-  const recentTransactions = [
-    {
-      id: 'TXN-2025-001',
-      employee: 'Sarah Johnson',
-      department: 'Sales',
-      amount: 156.80,
-      category: 'Client Lunch',
-      date: '2025-09-20',
-      status: 'pending',
-      urgency: 'normal'
-    },
-    {
-      id: 'TXN-2025-002',
-      employee: 'Mike Chen',
-      department: 'Marketing',
-      amount: 2847.50,
-      category: 'Conference',
-      date: '2025-09-19',
-      status: 'approved',
-      urgency: 'high'
-    },
-    {
-      id: 'TXN-2025-003',
-      employee: 'Emma Davis',
-      department: 'Engineering',
-      amount: 599.99,
-      category: 'Software',
-      date: '2025-09-19',
-      status: 'reconciled',
-      urgency: 'normal'
-    },
-    {
-      id: 'TXN-2025-004',
-      employee: 'James Wilson',
-      department: 'Sales',
-      amount: 89.50,
-      category: 'Transportation',
-      date: '2025-09-18',
-      status: 'pending',
-      urgency: 'normal'
-    },
-    {
-      id: 'TXN-2025-005',
-      employee: 'Lisa Brown',
-      department: 'Operations',
-      amount: 234.75,
-      category: 'Office Supplies',
-      date: '2025-09-18',
-      status: 'rejected',
-      urgency: 'low'
-    }
-  ];
-
-  // Approval queue
-  const approvalQueue = [
-    {
-      id: 'APP-001',
-      employee: 'David Kim',
-      amount: 1247.80,
-      category: 'Travel',
-      submitDate: '2025-09-18',
-      daysWaiting: 2,
-      priority: 'high'
-    },
-    {
-      id: 'APP-002',
-      employee: 'Maria Garcia',
-      amount: 567.45,
-      category: 'Entertainment',
-      submitDate: '2025-09-19',
-      daysWaiting: 1,
-      priority: 'medium'
-    },
-    {
-      id: 'APP-003',
-      employee: 'Tom Anderson',
-      amount: 89.99,
-      category: 'Supplies',
-      submitDate: '2025-09-20',
-      daysWaiting: 0,
-      priority: 'low'
-    }
-  ];
 
   const getStatusColor = (status) => {
     switch (status) {

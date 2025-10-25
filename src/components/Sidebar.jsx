@@ -1,6 +1,6 @@
 
 // components/Sidebar.jsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -14,6 +14,15 @@ import {
 } from 'lucide-react';
 
 const Sidebar = () => {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
   const sidebarItems = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/dashboard/transactions', label: 'Transactions', icon: Receipt },
@@ -66,12 +75,20 @@ const Sidebar = () => {
         {/* User Profile */}
         <div className="border-t border-gray-200 p-4">
           <div className="flex items-center">
-            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-              <User className="w-5 h-5 text-gray-600" />
+            <div className="w-8 h-8 bg-gradient-to-r from-[#b892ff] to-[#8b5cf6] rounded-full flex items-center justify-center text-white font-semibold">
+              {user ? (
+                `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`.toUpperCase()
+              ) : (
+                <User className="w-5 h-5" />
+              )}
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-900">John Doe</p>
-              <p className="text-xs text-gray-500">Admin</p>
+              <p className="text-sm font-medium text-gray-900">
+                {user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : 'Loading...'}
+              </p>
+              <p className="text-xs text-gray-500">
+                {user?.role === 'employee' ? 'Employee' : 'Admin'}
+              </p>
             </div>
           </div>
         </div>

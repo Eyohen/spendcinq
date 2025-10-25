@@ -40,6 +40,7 @@ import {
   XCircle,
   AlertCircle,
   Users,
+  User,
   UserCheck,
   UserX,
   Settings,
@@ -128,175 +129,6 @@ const Employees = () => {
     }
   };
 
-  // Mock data for development
-  const mockEmployees = [
-    {
-      id: 'EMP-001',
-      name: 'Sarah Johnson',
-      email: 'sarah.johnson@company.com',
-      phone: '+1 (555) 123-4567',
-      department: 'Sales',
-      position: 'Senior Sales Manager',
-      manager: 'Mike Chen',
-      employeeId: 'SJ001',
-      status: 'active',
-      startDate: '2022-03-15',
-      location: 'New York, NY',
-      avatar: null,
-      totalExpenses: 12450.80,
-      monthlyExpenses: 2847.50,
-      transactionCount: 45,
-      avgTransaction: 276.68,
-      lastExpense: '2025-09-18',
-      spendingLimit: 5000,
-      approvalLimit: 2000,
-      reimbursementMethod: 'Direct Deposit',
-      bankAccount: '**** 4532',
-      emergencyContact: 'John Johnson',
-      emergencyPhone: '+1 (555) 987-6543',
-      address: '123 Main St, New York, NY 10001',
-      birthDate: '1985-07-22',
-      hireDate: '2022-03-15',
-      salary: 85000,
-      benefits: ['Health Insurance', 'Dental', '401k'],
-      skills: ['Sales', 'Client Relations', 'Negotiation'],
-      performance: 4.5,
-      reports: []
-    },
-    {
-      id: 'EMP-002',
-      name: 'Mike Chen',
-      email: 'mike.chen@company.com',
-      phone: '+1 (555) 234-5678',
-      department: 'Marketing',
-      position: 'Marketing Director',
-      manager: 'Emma Davis',
-      employeeId: 'MC002',
-      status: 'active',
-      startDate: '2021-08-20',
-      location: 'San Francisco, CA',
-      avatar: null,
-      totalExpenses: 18920.45,
-      monthlyExpenses: 4156.20,
-      transactionCount: 67,
-      avgTransaction: 282.25,
-      lastExpense: '2025-09-17',
-      spendingLimit: 7500,
-      approvalLimit: 5000,
-      reimbursementMethod: 'Corporate Card',
-      bankAccount: '**** 8976',
-      emergencyContact: 'Linda Chen',
-      emergencyPhone: '+1 (555) 876-5432',
-      address: '456 Oak Ave, San Francisco, CA 94102',
-      birthDate: '1982-11-15',
-      hireDate: '2021-08-20',
-      salary: 95000,
-      benefits: ['Health Insurance', 'Dental', '401k', 'Stock Options'],
-      skills: ['Digital Marketing', 'Strategy', 'Analytics'],
-      performance: 4.8,
-      reports: ['Sarah Johnson', 'James Wilson']
-    },
-    {
-      id: 'EMP-003',
-      name: 'Emma Davis',
-      email: 'emma.davis@company.com',
-      phone: '+1 (555) 345-6789',
-      department: 'Engineering',
-      position: 'VP of Engineering',
-      manager: 'CEO',
-      employeeId: 'ED003',
-      status: 'active',
-      startDate: '2020-01-10',
-      location: 'Seattle, WA',
-      avatar: null,
-      totalExpenses: 15670.30,
-      monthlyExpenses: 3890.75,
-      transactionCount: 52,
-      avgTransaction: 301.35,
-      lastExpense: '2025-09-16',
-      spendingLimit: 10000,
-      approvalLimit: 7500,
-      reimbursementMethod: 'Direct Deposit',
-      bankAccount: '**** 1234',
-      emergencyContact: 'Robert Davis',
-      emergencyPhone: '+1 (555) 765-4321',
-      address: '789 Pine St, Seattle, WA 98101',
-      birthDate: '1980-04-08',
-      hireDate: '2020-01-10',
-      salary: 140000,
-      benefits: ['Health Insurance', 'Dental', '401k', 'Stock Options', 'Equity'],
-      skills: ['Software Engineering', 'Team Leadership', 'Architecture'],
-      performance: 4.9,
-      reports: ['Mike Chen', 'Lisa Brown', 'Tom Wilson']
-    },
-    {
-      id: 'EMP-004',
-      name: 'James Wilson',
-      email: 'james.wilson@company.com',
-      phone: '+1 (555) 456-7890',
-      department: 'Sales',
-      position: 'Sales Representative',
-      manager: 'Sarah Johnson',
-      employeeId: 'JW004',
-      status: 'active',
-      startDate: '2023-06-01',
-      location: 'Boston, MA',
-      avatar: null,
-      totalExpenses: 8940.25,
-      monthlyExpenses: 1987.50,
-      transactionCount: 28,
-      avgTransaction: 319.30,
-      lastExpense: '2025-09-15',
-      spendingLimit: 3000,
-      approvalLimit: 1000,
-      reimbursementMethod: 'Direct Deposit',
-      bankAccount: '**** 5678',
-      emergencyContact: 'Mary Wilson',
-      emergencyPhone: '+1 (555) 654-3210',
-      address: '321 Elm St, Boston, MA 02101',
-      birthDate: '1990-09-12',
-      hireDate: '2023-06-01',
-      salary: 65000,
-      benefits: ['Health Insurance', 'Dental', '401k'],
-      skills: ['Sales', 'Customer Service', 'Communication'],
-      performance: 4.2,
-      reports: []
-    },
-    {
-      id: 'EMP-005',
-      name: 'Lisa Brown',
-      email: 'lisa.brown@company.com',
-      phone: '+1 (555) 567-8901',
-      department: 'Operations',
-      position: 'Operations Manager',
-      manager: 'Emma Davis',
-      employeeId: 'LB005',
-      status: 'inactive',
-      startDate: '2021-11-15',
-      location: 'Chicago, IL',
-      avatar: null,
-      totalExpenses: 6750.60,
-      monthlyExpenses: 1456.25,
-      transactionCount: 22,
-      avgTransaction: 306.85,
-      lastExpense: '2025-08-28',
-      spendingLimit: 4000,
-      approvalLimit: 2500,
-      reimbursementMethod: 'Check',
-      bankAccount: '**** 9012',
-      emergencyContact: 'David Brown',
-      emergencyPhone: '+1 (555) 543-2109',
-      address: '654 Maple Dr, Chicago, IL 60601',
-      birthDate: '1987-02-28',
-      hireDate: '2021-11-15',
-      salary: 75000,
-      benefits: ['Health Insurance', 'Dental'],
-      skills: ['Operations', 'Process Improvement', 'Analytics'],
-      performance: 4.0,
-      reports: []
-    }
-  ];
-
   const getStatusColor = (status) => {
     switch (status) {
       case 'active': return 'text-green-700 bg-green-50 border-green-200';
@@ -331,103 +163,169 @@ const Employees = () => {
     }
   };
 
-  const EmployeeCard = ({ employee }) => (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center">
-          <div className="w-12 h-12 bg-gradient-to-r from-[#b892ff] to-[#8b5cf6] rounded-full flex items-center justify-center text-white font-semibold">
-            {employee.name.split(' ').map(n => n[0]).join('')}
-          </div>
-          <div className="ml-3">
-            <h3 className="font-semibold text-gray-900">{employee.name}</h3>
-            <p className="text-sm text-gray-500">{employee.position}</p>
-          </div>
-        </div>
-        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusColor(employee.status)}`}>
-          {getStatusIcon(employee.status)}
-          <span className="ml-1 capitalize">{employee.status}</span>
-        </span>
-      </div>
+  const EmployeeCard = ({ employee }) => {
+    const initials = employee.name
+      ? employee.name.split(' ').map(n => n[0]).join('').toUpperCase()
+      : 'N/A';
+    const performanceRating = employee.performanceRating || employee.performance || 0;
+    const monthlyExpenses = employee.monthlyExpenses || 0;
+    const transactionCount = employee.transactionCount || 0;
 
-      <div className="space-y-3">
-        <div className="flex items-center text-sm text-gray-600">
-          <Building className="w-4 h-4 mr-2" />
-          {employee.department}
-        </div>
-        <div className="flex items-center text-sm text-gray-600">
-          <Mail className="w-4 h-4 mr-2" />
-          {employee.email}
-        </div>
-        <div className="flex items-center text-sm text-gray-600">
-          <MapPin className="w-4 h-4 mr-2" />
-          {employee.location}
-        </div>
-      </div>
-
-      <div className="mt-4 pt-4 border-t border-gray-100">
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <p className="text-gray-500">Monthly Expenses</p>
-            <p className="font-semibold text-gray-900">${employee.monthlyExpenses.toLocaleString()}</p>
+    return (
+      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center">
+            <div className="w-12 h-12 bg-gradient-to-r from-[#b892ff] to-[#8b5cf6] rounded-full flex items-center justify-center text-white font-semibold">
+              {initials}
+            </div>
+            <div className="ml-3">
+              <h3 className="font-semibold text-gray-900">{employee.name || 'N/A'}</h3>
+              <p className="text-sm text-gray-500">{employee.position || 'N/A'}</p>
+              <p className="text-xs text-blue-600 font-mono font-medium">ID: {employee.employeeId || 'N/A'}</p>
+            </div>
           </div>
-          <div>
-            <p className="text-gray-500">Transactions</p>
-            <p className="font-semibold text-gray-900">{employee.transactionCount}</p>
+          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusColor(employee.status)}`}>
+            {getStatusIcon(employee.status)}
+            <span className="ml-1 capitalize">{employee.status}</span>
+          </span>
+        </div>
+
+        <div className="space-y-3">
+          <div className="flex items-center text-sm text-gray-600">
+            <Building className="w-4 h-4 mr-2" />
+            {employee.department || 'N/A'}
+          </div>
+          <div className="flex items-center text-sm text-gray-600">
+            <Mail className="w-4 h-4 mr-2" />
+            {employee.email || 'N/A'}
+          </div>
+          <div className="flex items-center text-sm text-gray-600">
+            <MapPin className="w-4 h-4 mr-2" />
+            {employee.location || 'N/A'}
           </div>
         </div>
-      </div>
 
-      <div className="mt-4 flex items-center justify-between">
-        <div className="flex items-center space-x-1">
-          {[...Array(5)].map((_, i) => (
-            <Star
-              key={i}
-              className={`w-4 h-4 ${
-                i < Math.floor(employee.performance)
-                  ? 'text-yellow-400 fill-current'
-                  : 'text-gray-300'
-              }`}
-            />
-          ))}
-          <span className="text-sm text-gray-600 ml-2">{employee.performance}</span>
+        <div className="mt-4 pt-4 border-t border-gray-100">
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p className="text-gray-500">Monthly Expenses</p>
+              <p className="font-semibold text-gray-900">${monthlyExpenses.toLocaleString()}</p>
+            </div>
+            <div>
+              <p className="text-gray-500">Transactions</p>
+              <p className="font-semibold text-gray-900">{transactionCount}</p>
+            </div>
+          </div>
         </div>
-        <button
-          onClick={() => {
-            setSelectedEmployee(employee);
-            setShowEmployeeModal(true);
-          }}
-          className="text-[#b892ff] hover:text-[#a075ff] font-medium text-sm"
-        >
-          View Details
-        </button>
+
+        <div className="mt-4 flex items-center justify-between">
+          <div className="flex items-center space-x-1">
+            {[...Array(5)].map((_, i) => (
+              <Star
+                key={i}
+                className={`w-4 h-4 ${
+                  i < Math.floor(performanceRating)
+                    ? 'text-yellow-400 fill-current'
+                    : 'text-gray-300'
+                }`}
+              />
+            ))}
+            <span className="text-sm text-gray-600 ml-2">{performanceRating > 0 ? performanceRating : 'N/A'}</span>
+          </div>
+          <button
+            onClick={() => {
+              setSelectedEmployee(employee);
+              setShowEmployeeModal(true);
+            }}
+            className="text-[#b892ff] hover:text-[#a075ff] font-medium text-sm"
+          >
+            View Details
+          </button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const EmployeeModal = ({ employee, onClose }) => {
     if (!employee) return null;
+
+    // Safe access to employee properties with defaults
+    const initials = employee.name
+      ? employee.name.split(' ').map(n => n[0]).join('').toUpperCase()
+      : 'N/A';
+    const performanceRating = employee.performanceRating || employee.performance || 0;
+    const salary = employee.salary || 0;
+    const totalExpenses = employee.totalExpenses || 0;
+    const monthlyExpenses = employee.monthlyExpenses || 0;
+    const transactionCount = employee.transactionCount || 0;
+    const avgTransaction = employee.avgTransaction || 0;
+    const spendingLimit = employee.spendingLimit || 0;
+    const approvalLimit = employee.approvalLimit || 0;
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
           {/* Modal Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <div className="flex items-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-[#b892ff] to-[#8b5cf6] rounded-full flex items-center justify-center text-white font-bold text-xl">
-                {employee.name.split(' ').map(n => n[0]).join('')}
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-[#b892ff] to-[#8b5cf6] rounded-full flex items-center justify-center text-white font-bold text-xl">
+                  {initials}
+                </div>
+                <div className="ml-4">
+                  <h2 className="text-xl font-semibold text-gray-900">{employee.name || 'N/A'}</h2>
+                  <p className="text-gray-500">
+                    {employee.position || 'N/A'} • {employee.department || 'N/A'}
+                  </p>
+                </div>
               </div>
-              <div className="ml-4">
-                <h2 className="text-xl font-semibold text-gray-900">{employee.name}</h2>
-                <p className="text-gray-500">{employee.position} • {employee.department}</p>
-                <p className="text-sm text-gray-400">{employee.employeeId}</p>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Employee Credentials Card */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center mb-2">
+                    <User className="w-4 h-4 text-blue-600 mr-2" />
+                    <span className="text-sm font-medium text-blue-900">Employee Login Credentials</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div>
+                      <label className="text-xs text-blue-600 font-medium">Employee ID:</label>
+                      <p className="text-sm font-mono font-semibold text-gray-900 bg-white px-2 py-1 rounded inline-block ml-2">
+                        {employee.employeeId || 'N/A'}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-blue-600 font-medium">Default Password:</label>
+                      <p className="text-sm font-mono font-semibold text-gray-900 bg-white px-2 py-1 rounded inline-block ml-2">
+                        spendcinq123
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-blue-600 mt-2">
+                    Share these credentials with the employee for login at /employee-signin
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    const credentials = `Employee ID: ${employee.employeeId}\nPassword: spendcinq123\nLogin at: ${window.location.origin}/employee-signin`;
+                    navigator.clipboard.writeText(credentials);
+                    alert('Credentials copied to clipboard!');
+                  }}
+                  className="ml-4 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  Copy
+                </button>
               </div>
             </div>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
           </div>
 
           {/* Modal Content */}
@@ -440,24 +338,15 @@ const Employees = () => {
                   <div className="space-y-3">
                     <div>
                       <label className="text-sm font-medium text-gray-700">Email</label>
-                      <p className="mt-1 text-gray-900">{employee.email}</p>
+                      <p className="mt-1 text-gray-900">{employee.email || 'N/A'}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-700">Phone</label>
-                      <p className="mt-1 text-gray-900">{employee.phone}</p>
+                      <p className="mt-1 text-gray-900">{employee.phone || 'N/A'}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-700">Location</label>
-                      <p className="mt-1 text-gray-900">{employee.location}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">Address</label>
-                      <p className="mt-1 text-gray-900">{employee.address}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">Emergency Contact</label>
-                      <p className="mt-1 text-gray-900">{employee.emergencyContact}</p>
-                      <p className="text-sm text-gray-500">{employee.emergencyPhone}</p>
+                      <p className="mt-1 text-gray-900">{employee.location || 'N/A'}</p>
                     </div>
                   </div>
                 </div>
@@ -467,34 +356,38 @@ const Employees = () => {
                   <div className="space-y-3">
                     <div>
                       <label className="text-sm font-medium text-gray-700">Start Date</label>
-                      <p className="mt-1 text-gray-900">{employee.startDate}</p>
+                      <p className="mt-1 text-gray-900">{employee.startDate || 'N/A'}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-700">Manager</label>
-                      <p className="mt-1 text-gray-900">{employee.manager}</p>
+                      <p className="mt-1 text-gray-900">{employee.manager || 'N/A'}</p>
                     </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">Salary</label>
-                      <p className="mt-1 text-gray-900">${employee.salary.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">Performance Rating</label>
-                      <div className="mt-1 flex items-center">
-                        <div className="flex items-center space-x-1">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`w-4 h-4 ${
-                                i < Math.floor(employee.performance)
-                                  ? 'text-yellow-400 fill-current'
-                                  : 'text-gray-300'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <span className="ml-2 font-medium">{employee.performance}/5</span>
+                    {salary > 0 && (
+                      <div>
+                        <label className="text-sm font-medium text-gray-700">Salary</label>
+                        <p className="mt-1 text-gray-900">${salary.toLocaleString()}</p>
                       </div>
-                    </div>
+                    )}
+                    {performanceRating > 0 && (
+                      <div>
+                        <label className="text-sm font-medium text-gray-700">Performance Rating</label>
+                        <div className="mt-1 flex items-center">
+                          <div className="flex items-center space-x-1">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-4 h-4 ${
+                                  i < Math.floor(performanceRating)
+                                    ? 'text-yellow-400 fill-current'
+                                    : 'text-gray-300'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <span className="ml-2 font-medium">{performanceRating}/5</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -508,7 +401,7 @@ const Employees = () => {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm font-medium text-blue-600">Total Expenses</p>
-                          <p className="text-2xl font-bold text-blue-900">${employee.totalExpenses.toLocaleString()}</p>
+                          <p className="text-2xl font-bold text-blue-900">${totalExpenses.toLocaleString()}</p>
                         </div>
                         <DollarSign className="w-8 h-8 text-blue-600" />
                       </div>
@@ -517,7 +410,7 @@ const Employees = () => {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm font-medium text-green-600">Monthly Expenses</p>
-                          <p className="text-2xl font-bold text-green-900">${employee.monthlyExpenses.toLocaleString()}</p>
+                          <p className="text-2xl font-bold text-green-900">${monthlyExpenses.toLocaleString()}</p>
                         </div>
                         <TrendingUp className="w-8 h-8 text-green-600" />
                       </div>
@@ -526,7 +419,7 @@ const Employees = () => {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm font-medium text-purple-600">Transactions</p>
-                          <p className="text-2xl font-bold text-purple-900">{employee.transactionCount}</p>
+                          <p className="text-2xl font-bold text-purple-900">{transactionCount}</p>
                         </div>
                         <FileText className="w-8 h-8 text-purple-600" />
                       </div>
@@ -535,7 +428,7 @@ const Employees = () => {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm font-medium text-orange-600">Avg Transaction</p>
-                          <p className="text-2xl font-bold text-orange-900">${employee.avgTransaction.toFixed(0)}</p>
+                          <p className="text-2xl font-bold text-orange-900">${avgTransaction.toFixed(0)}</p>
                         </div>
                         <Calendar className="w-8 h-8 text-orange-600" />
                       </div>
@@ -550,69 +443,77 @@ const Employees = () => {
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-sm font-medium text-gray-700">Monthly Spending Limit</span>
                         <span className="text-sm text-gray-500">
-                          ${employee.monthlyExpenses.toLocaleString()} / ${employee.spendingLimit.toLocaleString()}
+                          ${monthlyExpenses.toLocaleString()} / ${spendingLimit.toLocaleString()}
                         </span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-3">
                         <div
                           className={`h-3 rounded-full transition-all duration-300 ${
-                            (employee.monthlyExpenses / employee.spendingLimit) * 100 > 80 
-                              ? 'bg-red-500' 
-                              : (employee.monthlyExpenses / employee.spendingLimit) * 100 > 60 
-                              ? 'bg-yellow-500' 
+                            spendingLimit > 0 && (monthlyExpenses / spendingLimit) * 100 > 80
+                              ? 'bg-red-500'
+                              : spendingLimit > 0 && (monthlyExpenses / spendingLimit) * 100 > 60
+                              ? 'bg-yellow-500'
                               : 'bg-green-500'
                           }`}
-                          style={{ width: `${Math.min((employee.monthlyExpenses / employee.spendingLimit) * 100, 100)}%` }}
+                          style={{
+                            width: `${spendingLimit > 0 ? Math.min((monthlyExpenses / spendingLimit) * 100, 100) : 0}%`
+                          }}
                         ></div>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="text-sm font-medium text-gray-700">Approval Limit</label>
-                        <p className="mt-1 text-gray-900">${employee.approvalLimit.toLocaleString()}</p>
+                        <p className="mt-1 text-gray-900">${approvalLimit.toLocaleString()}</p>
                       </div>
                       <div>
                         <label className="text-sm font-medium text-gray-700">Reimbursement Method</label>
-                        <p className="mt-1 text-gray-900">{employee.reimbursementMethod}</p>
-                        {employee.bankAccount && (
-                          <p className="text-sm text-gray-500">{employee.bankAccount}</p>
+                        <p className="mt-1 text-gray-900">{employee.reimbursementMethod || 'N/A'}</p>
+                        {employee.bankName && (
+                          <p className="text-sm text-gray-500">{employee.bankName}</p>
                         )}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Benefits & Skills</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">Benefits</label>
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {employee.benefits.map((benefit, index) => (
-                          <span
-                            key={index}
-                            className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                          >
-                            {benefit}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">Skills</label>
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {employee.skills.map((skill, index) => (
-                          <span
-                            key={index}
-                            className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
+                {(employee.benefits?.length > 0 || employee.skills?.length > 0) && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Benefits & Skills</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      {employee.benefits?.length > 0 && (
+                        <div>
+                          <label className="text-sm font-medium text-gray-700">Benefits</label>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {employee.benefits.map((benefit, index) => (
+                              <span
+                                key={index}
+                                className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                              >
+                                {benefit}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {employee.skills?.length > 0 && (
+                        <div>
+                          <label className="text-sm font-medium text-gray-700">Skills</label>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {employee.skills.map((skill, index) => (
+                              <span
+                                key={index}
+                                className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -638,12 +539,12 @@ const Employees = () => {
   };
 
   const filteredEmployees = allEmployees.filter(employee => {
-    const matchesSearch = employee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         employee.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         employee.department.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = (employee.name?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+                         (employee.email?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+                         (employee.department?.toLowerCase() || '').includes(searchQuery.toLowerCase());
     const matchesDepartment = departmentFilter === 'all' || employee.department === departmentFilter;
     const matchesStatus = statusFilter === 'all' || employee.status === statusFilter;
-    
+
     return matchesSearch && matchesDepartment && matchesStatus;
   });
 
@@ -841,19 +742,20 @@ const Employees = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-gradient-to-r from-[#b892ff] to-[#8b5cf6] rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                          {employee.name.split(' ').map(n => n[0]).join('')}
+                          {employee.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'N/A'}
                         </div>
                         <div className="ml-3">
-                          <div className="text-sm font-medium text-gray-900">{employee.name}</div>
-                          <div className="text-sm text-gray-500">{employee.position}</div>
+                          <div className="text-sm font-medium text-gray-900">{employee.name || 'N/A'}</div>
+                          <div className="text-sm text-gray-500">{employee.position || 'N/A'}</div>
+                          <div className="text-xs text-blue-600 font-mono font-medium">ID: {employee.employeeId || 'N/A'}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {employee.department}
+                      {employee.department || 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      ${employee.monthlyExpenses.toLocaleString()}
+                      ${(employee.monthlyExpenses || 0).toLocaleString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -862,14 +764,16 @@ const Employees = () => {
                             <Star
                               key={i}
                               className={`w-4 h-4 ${
-                                i < Math.floor(employee.performance)
+                                i < Math.floor(employee.performanceRating || employee.performance || 0)
                                   ? 'text-yellow-400 fill-current'
                                   : 'text-gray-300'
                               }`}
                             />
                           ))}
                         </div>
-                        <span className="ml-2 text-sm text-gray-600">{employee.performance}</span>
+                        <span className="ml-2 text-sm text-gray-600">
+                          {employee.performanceRating || employee.performance || 'N/A'}
+                        </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -916,6 +820,409 @@ const Employees = () => {
           }}
         />
       )}
+
+      {/* Add Employee Modal */}
+      {showAddEmployee && (
+        <AddEmployeeModal
+          companyId={companyId}
+          onClose={() => setShowAddEmployee(false)}
+          onSuccess={() => {
+            setShowAddEmployee(false);
+            fetchEmployees(companyId);
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+// Add Employee Modal Component
+const AddEmployeeModal = ({ companyId, onClose, onSuccess }) => {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    position: '',
+    department: '',
+    location: '',
+    hireDate: '',
+    salary: '',
+    monthlySpendingLimit: '',
+    approvalLimit: '',
+    reimbursementMethod: 'Direct Deposit',
+    bankName: '',
+    accountNumber: '',
+    accountName: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [departments, setDepartments] = useState([]);
+
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
+
+  const fetchDepartments = async () => {
+    const token = localStorage.getItem('access_token');
+    if (!token || !companyId) return;
+
+    try {
+      // Try to fetch company's employees to get their departments
+      const response = await axios.get(
+        `${URL}/api/employees/company/${companyId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success && response.data.employees) {
+        // Extract unique departments from existing employees
+        const uniqueDepts = new Map();
+        response.data.employees.forEach(emp => {
+          if (emp.department && emp.department.id) {
+            uniqueDepts.set(emp.department.id, {
+              id: emp.department.id,
+              name: emp.department.name
+            });
+          }
+        });
+
+        const deptList = Array.from(uniqueDepts.values());
+        if (deptList.length > 0) {
+          setDepartments(deptList);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching departments:', error);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setError('');
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    // Validation
+    if (!formData.firstName || !formData.lastName || !formData.email) {
+      setError('First name, last name, and email are required');
+      return;
+    }
+
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      setError('Authentication token not found');
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const payload = {
+        companyId,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone || null,
+        position: formData.position || null,
+        location: formData.location || null,
+        hireDate: formData.hireDate || new Date().toISOString().split('T')[0],
+        salary: formData.salary ? parseFloat(formData.salary) : null,
+        monthlySpendingLimit: formData.monthlySpendingLimit ? parseFloat(formData.monthlySpendingLimit) : 0,
+        approvalLimit: formData.approvalLimit ? parseFloat(formData.approvalLimit) : 0,
+        reimbursementMethod: formData.reimbursementMethod,
+        bankName: formData.bankName || null,
+        accountNumber: formData.accountNumber || null,
+        accountName: formData.accountName || null
+      };
+
+      // Only add departmentId if one was selected
+      if (formData.department && formData.department !== '') {
+        payload.departmentId = formData.department;
+      }
+
+      console.log('Creating employee with payload:', payload);
+
+      const response = await axios.post(
+        `${URL}/api/employees`,
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        alert(`Employee created successfully!\n\nEmployee ID: ${response.data.employee.employeeId}\nDefault Password: spendcinq123\n\nPlease share these credentials with the employee.`);
+        onSuccess();
+      } else {
+        setError(response.data.message || 'Failed to create employee');
+      }
+    } catch (error) {
+      console.error('Error creating employee:', error);
+      const errorMessage = error.response?.data?.message
+        || error.response?.data?.error
+        || error.message
+        || 'Failed to create employee. Please try again.';
+      setError(errorMessage);
+      alert(`Error: ${errorMessage}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-gray-900">Add New Employee</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6">
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              {error}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Personal Information */}
+            <div className="md:col-span-2">
+              <h3 className="text-lg font-medium text-gray-900 mb-3">Personal Information</h3>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                First Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Last Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
+              />
+            </div>
+
+            {/* Employment Information */}
+            <div className="md:col-span-2 mt-4">
+              <h3 className="text-lg font-medium text-gray-900 mb-3">Employment Information</h3>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Position</label>
+              <input
+                type="text"
+                name="position"
+                value={formData.position}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Department (Optional)</label>
+              <select
+                name="department"
+                value={formData.department}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
+              >
+                <option value="">None</option>
+                {departments.map(dept => (
+                  <option key={dept.id} value={dept.id}>{dept.name}</option>
+                ))}
+              </select>
+              {departments.length === 0 && (
+                <p className="text-xs text-gray-500 mt-1">
+                  No departments available. You can assign this later.
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+              <input
+                type="text"
+                name="location"
+                value={formData.location}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Hire Date</label>
+              <input
+                type="date"
+                name="hireDate"
+                value={formData.hireDate}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Salary</label>
+              <input
+                type="number"
+                name="salary"
+                value={formData.salary}
+                onChange={handleChange}
+                min="0"
+                step="0.01"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
+              />
+            </div>
+
+            {/* Financial Information */}
+            <div className="md:col-span-2 mt-4">
+              <h3 className="text-lg font-medium text-gray-900 mb-3">Financial Settings</h3>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Spending Limit</label>
+              <input
+                type="number"
+                name="monthlySpendingLimit"
+                value={formData.monthlySpendingLimit}
+                onChange={handleChange}
+                min="0"
+                step="0.01"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Approval Limit</label>
+              <input
+                type="number"
+                name="approvalLimit"
+                value={formData.approvalLimit}
+                onChange={handleChange}
+                min="0"
+                step="0.01"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Reimbursement Method</label>
+              <select
+                name="reimbursementMethod"
+                value={formData.reimbursementMethod}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
+              >
+                <option value="Direct Deposit">Direct Deposit</option>
+                <option value="Corporate Card">Corporate Card</option>
+                <option value="Check">Check</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Bank Name</label>
+              <input
+                type="text"
+                name="bankName"
+                value={formData.bankName}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
+              <input
+                type="text"
+                name="accountNumber"
+                value={formData.accountNumber}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Account Name</label>
+              <input
+                type="text"
+                name="accountName"
+                value={formData.accountName}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
+              />
+            </div>
+          </div>
+
+          <div className="mt-6 flex items-center justify-between">
+            <p className="text-sm text-gray-600">
+              Default password will be: <span className="font-mono bg-gray-100 px-2 py-1 rounded">spendcinq123</span>
+            </p>
+            <div className="flex items-center space-x-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-4 py-2 bg-[#b892ff] text-white rounded-lg hover:bg-[#a075ff] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? 'Creating...' : 'Create Employee'}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

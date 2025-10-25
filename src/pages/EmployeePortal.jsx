@@ -155,20 +155,27 @@ const EmployeePortal = () => {
     try {
       setLoading(true);
 
+      // Prepare the payload with proper data types
+      const payload = {
+        companyId: user.companyId,
+        employeeId: user.id,
+        departmentId: user.department?.id || null,
+        categoryId: null, // We'll use category name in notes for now
+        description: expenseForm.description,
+        amount: parseFloat(expenseForm.amount),
+        merchantName: expenseForm.merchant || null,
+        paymentMethod: expenseForm.paymentMethod,
+        transactionDate: expenseForm.date || new Date().toISOString().split('T')[0],
+        notes: expenseForm.category
+          ? `Category: ${expenseForm.category}\n${expenseForm.notes || ''}`.trim()
+          : expenseForm.notes || null
+      };
+
+      console.log('Submitting transaction:', payload);
+
       const response = await axios.post(
         `${URL}/api/transactions`,
-        {
-          companyId: user.companyId,
-          employeeId: user.id,
-          departmentId: user.department?.id,
-          categoryId: expenseForm.category, // Should be category ID
-          description: expenseForm.description,
-          amount: parseFloat(expenseForm.amount),
-          merchantName: expenseForm.merchant,
-          paymentMethod: expenseForm.paymentMethod,
-          transactionDate: expenseForm.date || new Date().toISOString(),
-          notes: expenseForm.notes
-        },
+        payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -192,6 +199,9 @@ const EmployeePortal = () => {
           );
         }
 
+        // Show success message
+        alert('Expense submitted successfully! Your expense is now pending approval.');
+
         // Reset form and refresh
         setExpenseForm({
           amount: '',
@@ -208,64 +218,15 @@ const EmployeePortal = () => {
       }
     } catch (error) {
       console.error('Error submitting expense:', error);
-      alert('Failed to submit expense');
+      const errorMessage = error.response?.data?.message
+        || error.response?.data?.error
+        || error.message
+        || 'Failed to submit expense';
+      alert(`Error: ${errorMessage}\n\nPlease check the console for more details.`);
     } finally {
       setLoading(false);
     }
   };
-
-  // Mock data for development
-  const mockExpenses = [
-    {
-      id: 'EXP-001',
-      amount: 156.80,
-      category: 'Client Lunch',
-      description: 'Business lunch with potential client',
-      date: '2025-09-20',
-      merchant: 'The Steakhouse',
-      status: 'pending',
-      receipt: true,
-      submittedDate: '2025-09-20',
-      paymentMethod: 'personal'
-    },
-    {
-      id: 'EXP-002',
-      amount: 89.50,
-      category: 'Transportation',
-      description: 'Uber to client meeting',
-      date: '2025-09-19',
-      merchant: 'Uber',
-      status: 'approved',
-      receipt: true,
-      submittedDate: '2025-09-19',
-      paymentMethod: 'personal'
-    },
-    {
-      id: 'EXP-003',
-      amount: 245.00,
-      category: 'Office Supplies',
-      description: 'Laptop accessories for remote work',
-      date: '2025-09-18',
-      merchant: 'Best Buy',
-      status: 'reconciled',
-      receipt: true,
-      submittedDate: '2025-09-18',
-      paymentMethod: 'corporate'
-    },
-    {
-      id: 'EXP-004',
-      amount: 67.25,
-      category: 'Internet',
-      description: 'Monthly internet bill',
-      date: '2025-09-17',
-      merchant: 'Comcast',
-      status: 'rejected',
-      receipt: false,
-      submittedDate: '2025-09-17',
-      paymentMethod: 'personal',
-      rejectionReason: 'Personal expense not eligible for reimbursement'
-    }
-  ];
 
   const categories = [
     'Transportation',
@@ -330,12 +291,24 @@ const EmployeePortal = () => {
   const totalThisMonth = expenses.reduce((sum, exp) => sum + exp.amount, 0);
 
   const filteredExpenses = expenses.filter(expense => {
-    const matchesSearch = expense.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         expense.merchant.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         expense.category.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = (expense.description?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+                         (expense.merchant?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+                         (expense.category?.toLowerCase() || '').includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || expense.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  // Show loading state while employee data is being fetched
+  if (!employee) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[#b892ff] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading employee portal...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -365,8 +338,8 @@ const EmployeePortal = () => {
                   <User className="w-5 h-5 text-gray-600" />
                 </div>
                 <div className="hidden md:block">
-                  <p className="text-sm font-medium text-gray-900">{employee.name}</p>
-                  <p className="text-xs text-gray-500">{employee.id} • {employee.department}</p>
+                  <p className="text-sm font-medium text-gray-900">{employee.name || 'Employee'}</p>
+                  <p className="text-xs text-gray-500">{employee.id || 'N/A'} • {employee.department || 'N/A'}</p>
                 </div>
                 <button className="p-2 text-gray-400 hover:text-gray-600">
                   <LogOut className="w-5 h-5" />
@@ -381,7 +354,9 @@ const EmployeePortal = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Welcome back, {employee.name.split(' ')[0]}!</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Welcome back, {employee.name?.split(' ')[0] || 'Employee'}!
+          </h1>
           <p className="text-gray-600">Manage your expenses and track reimbursements</p>
         </div>
 

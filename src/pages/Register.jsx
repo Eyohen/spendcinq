@@ -592,6 +592,7 @@ const Register = () => {
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
             >
               <option value="">Select Country</option>
+              <option value="NG">Nigeria</option>
               <option value="US">United States</option>
               <option value="CA">Canada</option>
               <option value="UK">United Kingdom</option>
