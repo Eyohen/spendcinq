@@ -198,7 +198,7 @@ const Home = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 whitespace-nowrap">Total Expenses</p>
-                <p className="text-xl font-bold text-gray-900">$248,567</p>
+                <p className="text-xl font-bold text-gray-900">₦248,567</p>
                 <p className="text-xs text-green-600">+12.5%</p>
               </div>
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
@@ -210,7 +210,7 @@ const Home = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">This Month</p>
-                <p className="text-xl font-bold text-gray-900">$18,456</p>
+                <p className="text-xl font-bold text-gray-900">₦18,456</p>
                 <p className="text-xs text-blue-600">1,247 transactions</p>
               </div>
               <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
@@ -222,7 +222,7 @@ const Home = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Pending</p>
-                <p className="text-xl font-bold text-gray-900">$5,673</p>
+                <p className="text-xl font-bold text-gray-900">₦5,673</p>
                 <p className="text-xs text-orange-600">12 items</p>
               </div>
               <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
@@ -236,7 +236,7 @@ const Home = () => {
                 <p className="text-sm text-gray-600">Reimbursements</p>
                 <div className='flex'>
                     <div>
-                <p className="text-xl font-bold text-gray-900">$8,934</p>
+                <p className="text-xl font-bold text-gray-900">₦8,934</p>
                 <p className="text-xs text-green-600">23 employees</p>
                 </div>
                       <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
@@ -302,7 +302,7 @@ const Home = () => {
               <a href="#testimonials" className="text-gray-600 hover:text-gray-900 transition-colors">Customers</a>
               <Link to={"/contact"} className="text-gray-600 hover:text-gray-900 transition-colors">Contact</Link>
               <button onClick={() => navigate('/sign-in')}  className="text-gray-600 hover:text-gray-900 transition-colors">Sign In</button>
-              <button onClick={() => navigate('/dashboard')} className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors">
+              <button onClick={() => navigate('/sign-in')} className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors">
                 Start Free Trial
               </button>
             </div>
@@ -326,7 +326,7 @@ const Home = () => {
               <a href="#testimonials" className="block text-gray-600 hover:text-gray-900">Customers</a>
               <a href="#contact" className="block text-gray-600 hover:text-gray-900">Contact</a>
               <button className="block w-full text-left text-gray-600 hover:text-gray-900">Sign In</button>
-              <button className="block w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors">
+              <button onClick={() => navigate('/sign-in')} className="block w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors">
                 Start Free Trial
               </button>
             </div>
@@ -363,7 +363,7 @@ const Home = () => {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <button  onClick={() => navigate('/dashboard')} className="bg-[#b892ff] text-white px-8 py-4 rounded-xl hover:bg-primary-dark transition-all transform hover:scale-105 flex items-center justify-center text-lg font-semibold shadow-lg">
+                <button onClick={() => navigate('/sign-in')} className="bg-[#b892ff] text-white px-8 py-4 rounded-xl hover:bg-primary-dark transition-all transform hover:scale-105 flex items-center justify-center text-lg font-semibold shadow-lg">
                   Start Free Trial
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </button>
@@ -403,7 +403,7 @@ const Home = () => {
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-gray-900">Expense Approved</p>
-                    <p className="text-xs text-gray-500">$156.80 • Sarah Johnson</p>
+                    <p className="text-xs text-gray-500">₦156.80 • Sarah Johnson</p>
                   </div>
                 </div>
               </div>
@@ -587,7 +587,7 @@ const Home = () => {
                   ))}
                 </ul>
 
-                <button className={`w-full py-3 px-6 rounded-xl font-semibold transition-colors ${
+                <button onClick={() => navigate('/sign-in')} className={`w-full py-3 px-6 rounded-xl font-semibold transition-colors ${
                   plan.popular
                     ? 'bg-primary text-white hover:bg-primary-dark'
                     : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
@@ -617,7 +617,7 @@ const Home = () => {
             Join thousands of companies that have streamlined their financial operations with Spendcinq.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-primary px-8 py-4 rounded-xl hover:bg-gray-100 transition-colors font-semibold text-lg">
+            <button onClick={() => navigate('/sign-in')} className="bg-white text-primary px-8 py-4 rounded-xl hover:bg-gray-100 transition-colors font-semibold text-lg">
               Start Free Trial
             </button>
             <button className="border-2 border-white text-white px-8 py-4 rounded-xl hover:bg-white hover:text-primary transition-colors font-semibold text-lg">

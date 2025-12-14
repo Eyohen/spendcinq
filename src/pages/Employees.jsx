@@ -209,7 +209,7 @@ const Employees = () => {
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-gray-500">Monthly Expenses</p>
-              <p className="font-semibold text-gray-900">${monthlyExpenses.toLocaleString()}</p>
+              <p className="font-semibold text-gray-900">₦{monthlyExpenses.toLocaleString()}</p>
             </div>
             <div>
               <p className="text-gray-500">Transactions</p>
@@ -365,7 +365,7 @@ const Employees = () => {
                     {salary > 0 && (
                       <div>
                         <label className="text-sm font-medium text-gray-700">Salary</label>
-                        <p className="mt-1 text-gray-900">${salary.toLocaleString()}</p>
+                        <p className="mt-1 text-gray-900">₦{salary.toLocaleString()}</p>
                       </div>
                     )}
                     {performanceRating > 0 && (
@@ -401,7 +401,7 @@ const Employees = () => {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm font-medium text-blue-600">Total Expenses</p>
-                          <p className="text-2xl font-bold text-blue-900">${totalExpenses.toLocaleString()}</p>
+                          <p className="text-2xl font-bold text-blue-900">₦{totalExpenses.toLocaleString()}</p>
                         </div>
                         <DollarSign className="w-8 h-8 text-blue-600" />
                       </div>
@@ -410,7 +410,7 @@ const Employees = () => {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm font-medium text-green-600">Monthly Expenses</p>
-                          <p className="text-2xl font-bold text-green-900">${monthlyExpenses.toLocaleString()}</p>
+                          <p className="text-2xl font-bold text-green-900">₦{monthlyExpenses.toLocaleString()}</p>
                         </div>
                         <TrendingUp className="w-8 h-8 text-green-600" />
                       </div>
@@ -428,7 +428,7 @@ const Employees = () => {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm font-medium text-orange-600">Avg Transaction</p>
-                          <p className="text-2xl font-bold text-orange-900">${avgTransaction.toFixed(0)}</p>
+                          <p className="text-2xl font-bold text-orange-900">₦{avgTransaction.toFixed(0)}</p>
                         </div>
                         <Calendar className="w-8 h-8 text-orange-600" />
                       </div>
@@ -443,7 +443,7 @@ const Employees = () => {
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-sm font-medium text-gray-700">Monthly Spending Limit</span>
                         <span className="text-sm text-gray-500">
-                          ${monthlyExpenses.toLocaleString()} / ${spendingLimit.toLocaleString()}
+                          ₦{monthlyExpenses.toLocaleString()} / ₦{spendingLimit.toLocaleString()}
                         </span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-3">
@@ -464,7 +464,7 @@ const Employees = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="text-sm font-medium text-gray-700">Approval Limit</label>
-                        <p className="mt-1 text-gray-900">${approvalLimit.toLocaleString()}</p>
+                        <p className="mt-1 text-gray-900">₦{approvalLimit.toLocaleString()}</p>
                       </div>
                       <div>
                         <label className="text-sm font-medium text-gray-700">Reimbursement Method</label>
@@ -602,7 +602,7 @@ const Employees = () => {
             <div>
               <p className="text-sm font-medium text-gray-600">Total Expenses</p>
               <p className="text-2xl font-bold text-gray-900">
-                ${allEmployees.reduce((sum, emp) => sum + emp.totalExpenses, 0).toLocaleString()}
+                ₦{allEmployees.reduce((sum, emp) => sum + emp.totalExpenses, 0).toLocaleString()}
               </p>
             </div>
             <DollarSign className="w-8 h-8 text-purple-600" />
@@ -755,7 +755,7 @@ const Employees = () => {
                       {employee.department || 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      ${(employee.monthlyExpenses || 0).toLocaleString()}
+                      ₦{(employee.monthlyExpenses || 0).toLocaleString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -858,41 +858,52 @@ const AddEmployeeModal = ({ companyId, onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [departments, setDepartments] = useState([]);
+  const [showNewDeptInput, setShowNewDeptInput] = useState(false);
+  const [newDeptName, setNewDeptName] = useState('');
 
   useEffect(() => {
     fetchDepartments();
-  }, []);
+  }, [companyId]);
 
   const fetchDepartments = async () => {
     const token = localStorage.getItem('access_token');
     if (!token || !companyId) return;
 
     try {
-      // Try to fetch company's employees to get their departments
       const response = await axios.get(
-        `${URL}/api/employees/company/${companyId}`,
+        `${URL}/api/employees/departments/company/${companyId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (response.data.success && response.data.employees) {
-        // Extract unique departments from existing employees
-        const uniqueDepts = new Map();
-        response.data.employees.forEach(emp => {
-          if (emp.department && emp.department.id) {
-            uniqueDepts.set(emp.department.id, {
-              id: emp.department.id,
-              name: emp.department.name
-            });
-          }
-        });
-
-        const deptList = Array.from(uniqueDepts.values());
-        if (deptList.length > 0) {
-          setDepartments(deptList);
-        }
+      if (response.data.success) {
+        setDepartments(response.data.departments || []);
       }
     } catch (error) {
       console.error('Error fetching departments:', error);
+    }
+  };
+
+  const handleCreateDepartment = async () => {
+    if (!newDeptName.trim()) return;
+
+    const token = localStorage.getItem('access_token');
+    if (!token) return;
+
+    try {
+      const response = await axios.post(
+        `${URL}/api/employees/departments`,
+        { companyId, name: newDeptName.trim() },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        setDepartments([...departments, response.data.department]);
+        setFormData(prev => ({ ...prev, department: response.data.department.id }));
+        setNewDeptName('');
+        setShowNewDeptInput(false);
+      }
+    } catch (error) {
+      console.error('Error creating department:', error);
     }
   };
 
@@ -1068,21 +1079,55 @@ const AddEmployeeModal = ({ companyId, onClose, onSuccess }) => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Department (Optional)</label>
-              <select
-                name="department"
-                value={formData.department}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
-              >
-                <option value="">None</option>
-                {departments.map(dept => (
-                  <option key={dept.id} value={dept.id}>{dept.name}</option>
-                ))}
-              </select>
-              {departments.length === 0 && (
-                <p className="text-xs text-gray-500 mt-1">
-                  No departments available. You can assign this later.
-                </p>
+              {!showNewDeptInput ? (
+                <div className="flex gap-2">
+                  <select
+                    name="department"
+                    value={formData.department}
+                    onChange={handleChange}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
+                  >
+                    <option value="">Select Department</option>
+                    {departments.map(dept => (
+                      <option key={dept.id} value={dept.id}>{dept.name}</option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => setShowNewDeptInput(true)}
+                    className="px-3 py-2 text-[#b892ff] border border-[#b892ff] rounded-lg hover:bg-[#b892ff] hover:text-white transition-colors"
+                    title="Add new department"
+                  >
+                    +
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newDeptName}
+                    onChange={(e) => setNewDeptName(e.target.value)}
+                    placeholder="Enter department name"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#b892ff] focus:border-transparent"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCreateDepartment}
+                    className="px-3 py-2 bg-[#b892ff] text-white rounded-lg hover:bg-[#a075ff] transition-colors"
+                  >
+                    Add
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setShowNewDeptInput(false); setNewDeptName(''); }}
+                    className="px-3 py-2 text-gray-500 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+              {departments.length === 0 && !showNewDeptInput && (
+                <p className="text-xs text-gray-500 mt-1">No departments yet. Click + to create one.</p>
               )}
             </div>
 

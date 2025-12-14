@@ -5,6 +5,7 @@ import DashboardLayout from './components/DashboardLayout';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import Analytics from './pages/Analytics';
+import GeneralLedger from './pages/GeneralLedger';
 import Employees from './pages/Employees';
 import Billing from './pages/Billing';
 import Settings from './pages/Settings';
@@ -42,6 +43,11 @@ const App = () => {
         <Route path="/dashboard/analytics" element={
           <DashboardLayout>
             <Analytics />
+          </DashboardLayout>
+        } />
+        <Route path="/dashboard/general-ledger" element={
+          <DashboardLayout>
+            <GeneralLedger />
           </DashboardLayout>
         } />
         <Route path="/dashboard/employees" element={

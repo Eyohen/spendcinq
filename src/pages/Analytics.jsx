@@ -51,7 +51,9 @@ import {
   CheckCircle,
   AlertTriangle,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  BookOpen,
+  AlertCircle
 } from 'lucide-react';
 
 const Analytics = () => {
@@ -71,6 +73,7 @@ const Analytics = () => {
     pendingApprovals: 0,
     avgProcessingTime: 0
   });
+  const [glAnalytics, setGlAnalytics] = useState(null);
 
   // Fetch data on component mount
   useEffect(() => {
@@ -166,6 +169,21 @@ const Analytics = () => {
           department: emp.department || 'N/A'
         }));
         setTopEmployees(employees);
+      }
+
+      // Fetch General Ledger analytics
+      try {
+        const glResponse = await axios.get(
+          `${URL}/api/general-ledger/company/${companyId}/analytics`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (glResponse.data.success) {
+          setGlAnalytics(glResponse.data.analytics);
+        }
+      } catch (glError) {
+        // GL analytics is optional
+        console.log('GL analytics not available:', glError.message);
       }
 
     } catch (error) {
@@ -267,19 +285,19 @@ const Analytics = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatCard
             title="Total Expenses"
-            value={`$${analytics.totalExpenses.toLocaleString()}`}
+            value={`₦${analytics.totalExpenses.toLocaleString()}`}
             icon={DollarSign}
             color="blue"
           />
           <StatCard
             title="Pending Approvals"
-            value={`$${analytics.pendingApprovals.toLocaleString()}`}
+            value={`₦${analytics.pendingApprovals.toLocaleString()}`}
             icon={Clock}
             color="orange"
           />
           <StatCard
             title="This Month"
-            value={`$${analytics.thisMonth.toLocaleString()}`}
+            value={`₦${analytics.thisMonth.toLocaleString()}`}
             icon={Calendar}
             color="green"
           />
@@ -289,6 +307,102 @@ const Analytics = () => {
             icon={CreditCard}
             color="purple"
           />
+        </div>
+      )}
+
+      {/* General Ledger Summary */}
+      {glAnalytics && glAnalytics.totalAccounts > 0 && (
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-[#b892ff] rounded-lg flex items-center justify-center">
+                <BookOpen className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">General Ledger Overview</h3>
+                <p className="text-gray-500 text-sm">{glAnalytics.totalAccounts} accounts in chart of accounts</p>
+              </div>
+            </div>
+            <a
+              href="/dashboard/general-ledger"
+              className="px-4 py-2 bg-[#b892ff] text-white rounded-lg hover:bg-[#a078ff] transition-colors text-sm font-medium"
+            >
+              Manage Accounts
+            </a>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <p className="text-green-600 text-xs font-medium mb-1">Total Assets</p>
+              <p className="text-gray-900 text-lg font-bold">
+                ₦{(glAnalytics.totalAssets || 0).toLocaleString()}
+              </p>
+            </div>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-600 text-xs font-medium mb-1">Liabilities</p>
+              <p className="text-gray-900 text-lg font-bold">
+                ₦{(glAnalytics.totalLiabilities || 0).toLocaleString()}
+              </p>
+            </div>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p className="text-blue-600 text-xs font-medium mb-1">Equity</p>
+              <p className="text-gray-900 text-lg font-bold">
+                ₦{(glAnalytics.totalEquity || 0).toLocaleString()}
+              </p>
+            </div>
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+              <p className="text-purple-600 text-xs font-medium mb-1">Revenue</p>
+              <p className="text-gray-900 text-lg font-bold">
+                ₦{(glAnalytics.totalRevenue || 0).toLocaleString()}
+              </p>
+            </div>
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+              <p className="text-orange-600 text-xs font-medium mb-1">Expenses</p>
+              <p className="text-gray-900 text-lg font-bold">
+                ₦{(glAnalytics.totalExpenses || 0).toLocaleString()}
+              </p>
+            </div>
+          </div>
+
+          {/* Account Type Breakdown */}
+          {glAnalytics.accountsByType && glAnalytics.accountsByType.length > 0 && (
+            <div className="border-t border-gray-200 pt-4">
+              <h4 className="text-sm font-semibold text-gray-700 mb-3">Account Type Breakdown</h4>
+              <div className="space-y-2">
+                {glAnalytics.accountsByType.map((type, idx) => (
+                  <div key={idx} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{
+                          backgroundColor:
+                            type.accountType === 'Asset' ? '#10b981' :
+                            type.accountType === 'Liability' ? '#ef4444' :
+                            type.accountType === 'Equity' ? '#3b82f6' :
+                            type.accountType === 'Revenue' ? '#8b5cf6' :
+                            '#f59e0b'
+                        }}
+                      />
+                      <span className="text-sm text-gray-700">{type.accountType}</span>
+                      <span className="text-xs text-gray-500">({type.accountCount} accounts)</span>
+                    </div>
+                    <span className="text-sm font-semibold text-gray-900">
+                      ₦{Math.abs(type.totalBalance).toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {glAnalytics.unmappedTransactions > 0 && (
+            <div className="mt-4 bg-orange-50 border border-orange-200 rounded-lg p-3 flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-orange-600" />
+              <p className="text-orange-800 text-sm">
+                <span className="font-semibold">{glAnalytics.unmappedTransactions}</span> transactions need to be mapped to GL accounts
+              </p>
+            </div>
+          )}
         </div>
       )}
 
@@ -391,7 +505,7 @@ const Analytics = () => {
                       ></div>
                       <span className="text-gray-700">{category.name}</span>
                     </div>
-                    <span className="font-medium text-gray-900">${category.amount.toLocaleString()}</span>
+                    <span className="font-medium text-gray-900">₦{category.amount.toLocaleString()}</span>
                   </div>
                 ))}
               </div>
@@ -426,7 +540,7 @@ const Analytics = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium text-gray-700">{dept.department}</span>
                   <span className="text-sm text-gray-500">
-                    ${dept.spent.toLocaleString()} / ${dept.budget.toLocaleString()}
+                    ₦{dept.spent.toLocaleString()} / ₦{dept.budget.toLocaleString()}
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
@@ -440,7 +554,7 @@ const Analytics = () => {
                 </div>
                 <div className="flex justify-between text-xs text-gray-500">
                   <span>{dept.percentage}% used</span>
-                  <span>${(dept.budget - dept.spent).toLocaleString()} remaining</span>
+                  <span>₦{(dept.budget - dept.spent).toLocaleString()} remaining</span>
                 </div>
               </div>
             ))}
@@ -490,7 +604,7 @@ const Analytics = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium text-gray-900">${employee.amount.toLocaleString()}</p>
+                    <p className="font-medium text-gray-900">₦{employee.amount.toLocaleString()}</p>
                     <p className="text-sm text-gray-500">{employee.transactions} transactions</p>
                   </div>
                 </div>
@@ -515,7 +629,7 @@ const Analytics = () => {
                 <DollarSign className="w-5 h-5 text-blue-600 mr-3" />
                 <div>
                   <p className="font-medium text-blue-900">Total Expenses</p>
-                  <p className="text-sm text-blue-700">${analytics.totalExpenses.toLocaleString()} total spending</p>
+                  <p className="text-sm text-blue-700">₦{analytics.totalExpenses.toLocaleString()} total spending</p>
                 </div>
               </div>
             </div>
@@ -525,7 +639,7 @@ const Analytics = () => {
                 <Calendar className="w-5 h-5 text-green-600 mr-3" />
                 <div>
                   <p className="font-medium text-green-900">This Month</p>
-                  <p className="text-sm text-green-700">${analytics.thisMonth.toLocaleString()} in current month</p>
+                  <p className="text-sm text-green-700">₦{analytics.thisMonth.toLocaleString()} in current month</p>
                 </div>
               </div>
             </div>
@@ -535,7 +649,7 @@ const Analytics = () => {
                 <Clock className="w-5 h-5 text-orange-600 mr-3" />
                 <div>
                   <p className="font-medium text-orange-900">Pending Approvals</p>
-                  <p className="text-sm text-orange-700">${analytics.pendingApprovals.toLocaleString()} awaiting review</p>
+                  <p className="text-sm text-orange-700">₦{analytics.pendingApprovals.toLocaleString()} awaiting review</p>
                 </div>
               </div>
             </div>

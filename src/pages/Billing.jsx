@@ -387,7 +387,7 @@ const Billing = () => {
               <div className="flex items-center justify-between mb-4">
                 <h4 className="font-medium text-gray-900">{currentPlan.name} Plan</h4>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-gray-900">${currentPlan.price}</p>
+                  <p className="text-2xl font-bold text-gray-900">₦{currentPlan.price}</p>
                   <p className="text-sm text-gray-500">per {currentPlan.period}</p>
                 </div>
               </div>
@@ -480,7 +480,7 @@ const Billing = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Monthly Savings</p>
-                <p className="text-xl font-bold text-green-600">$10</p>
+                <p className="text-xl font-bold text-green-600">₦10</p>
                 <p className="text-xs text-gray-500">vs original price</p>
               </div>
               <Percent className="w-8 h-8 text-green-600" />
@@ -661,7 +661,7 @@ const Billing = () => {
                     {invoice.date}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">${invoice.amount.toFixed(2)}</div>
+                    <div className="text-sm font-medium text-gray-900">₦{invoice.amount.toFixed(2)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(invoice.status)}`}>

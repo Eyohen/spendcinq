@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   DollarSign,
   Mail,
@@ -23,6 +24,7 @@ import {
 } from 'lucide-react';
 
 const Contact = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -206,7 +208,7 @@ const Contact = () => {
             <button className="bg-[#b892ff] text-white px-8 py-4 rounded-xl hover:bg-[#a075ff] transition-colors font-semibold">
               Schedule a Demo
             </button>
-            <button className="border border-gray-300 text-gray-700 px-8 py-4 rounded-xl hover:bg-gray-50 transition-colors font-semibold">
+            <button onClick={() => navigate('/sign-in')} className="border border-gray-300 text-gray-700 px-8 py-4 rounded-xl hover:bg-gray-50 transition-colors font-semibold">
               Start Free Trial
             </button>
           </div>
@@ -443,7 +445,7 @@ const Contact = () => {
             Join thousands of companies that have streamlined their expense management with Spendcinq.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-[#b892ff] px-8 py-4 rounded-xl hover:bg-gray-100 transition-colors font-semibold">
+            <button onClick={() => navigate('/sign-in')} className="bg-white text-[#b892ff] px-8 py-4 rounded-xl hover:bg-gray-100 transition-colors font-semibold">
               Start Free Trial
             </button>
             <button className="border-2 border-white text-white px-8 py-4 rounded-xl hover:bg-white hover:text-[#b892ff] transition-colors font-semibold">

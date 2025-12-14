@@ -83,6 +83,9 @@ const Dashboard = () => {
   const [approvalQueue, setApprovalQueue] = useState([]);
   const [dailyActivity, setDailyActivity] = useState([]);
 
+  // General Ledger analytics
+  const [glAnalytics, setGlAnalytics] = useState(null);
+
   // Fetch data on component mount
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -205,6 +208,21 @@ const Dashboard = () => {
             priority: t.amount > 1000 ? 'high' : t.amount > 500 ? 'medium' : 'low'
           }));
         setApprovalQueue(pending);
+      }
+
+      // Fetch General Ledger analytics
+      try {
+        const glResponse = await axios.get(
+          `${URL}/api/general-ledger/company/${companyId}/analytics`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (glResponse.data.success) {
+          setGlAnalytics(glResponse.data.analytics);
+        }
+      } catch (glError) {
+        // GL analytics is optional, so don't fail the entire dashboard
+        console.log('GL analytics not available:', glError.message);
       }
 
     } catch (error) {
@@ -332,7 +350,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total Expenses"
-          value={`$${financialOverview.totalExpenses.toLocaleString()}`}
+          value={`₦${financialOverview.totalExpenses.toLocaleString()}`}
           change={`+${financialOverview.thisMonthGrowth}% from last month`}
           changeType="increase"
           icon={DollarSign}
@@ -341,15 +359,15 @@ const Dashboard = () => {
         />
         <StatCard
           title="This Month"
-          value={`$${financialOverview.monthlyExpenses.toLocaleString()}`}
+          value={`₦${financialOverview.monthlyExpenses.toLocaleString()}`}
           change={`${financialOverview.totalTransactions} transactions`}
           icon={TrendingUp}
           color="blue"
-          subtitle={`Avg: $${financialOverview.avgTransactionValue}`}
+          subtitle={`Avg: ₦${financialOverview.avgTransactionValue}`}
         />
         <StatCard
           title="Pending Approvals"
-          value={`$${financialOverview.pendingApprovals.toLocaleString()}`}
+          value={`₦${financialOverview.pendingApprovals.toLocaleString()}`}
           change="12 items waiting"
           icon={Clock}
           color="orange"
@@ -357,13 +375,76 @@ const Dashboard = () => {
         />
         <StatCard
           title="Reimbursements Due"
-          value={`$${financialOverview.reimbursementsDue.toLocaleString()}`}
+          value={`₦${financialOverview.reimbursementsDue.toLocaleString()}`}
           change="23 employees"
           icon={Wallet}
           color="green"
           subtitle="Ready for payment"
         />
       </div>
+
+      {/* General Ledger Summary - Only show if GL data is available */}
+      {glAnalytics && glAnalytics.totalAccounts > 0 && (
+        <div className="bg-gradient-to-r from-[#b892ff] to-[#8b5cf6] rounded-xl p-6 shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                <BookOpen className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-white text-lg font-semibold">General Ledger Summary</h3>
+                <p className="text-white/80 text-sm">{glAnalytics.totalAccounts} active accounts</p>
+              </div>
+            </div>
+            <a
+              href="/dashboard/general-ledger"
+              className="px-4 py-2 bg-white text-[#b892ff] rounded-lg hover:bg-white/90 transition-colors text-sm font-medium"
+            >
+              View Details
+            </a>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+              <p className="text-white/80 text-xs mb-1">Total Assets</p>
+              <p className="text-white text-xl font-bold">
+                ₦{(glAnalytics.totalAssets || 0).toLocaleString()}
+              </p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+              <p className="text-white/80 text-xs mb-1">Liabilities</p>
+              <p className="text-white text-xl font-bold">
+                ₦{(glAnalytics.totalLiabilities || 0).toLocaleString()}
+              </p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+              <p className="text-white/80 text-xs mb-1">Equity</p>
+              <p className="text-white text-xl font-bold">
+                ₦{(glAnalytics.totalEquity || 0).toLocaleString()}
+              </p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+              <p className="text-white/80 text-xs mb-1">Revenue</p>
+              <p className="text-white text-xl font-bold">
+                ₦{(glAnalytics.totalRevenue || 0).toLocaleString()}
+              </p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+              <p className="text-white/80 text-xs mb-1">Expenses</p>
+              <p className="text-white text-xl font-bold">
+                ₦{(glAnalytics.totalExpenses || 0).toLocaleString()}
+              </p>
+            </div>
+          </div>
+          {glAnalytics.unmappedTransactions > 0 && (
+            <div className="mt-4 bg-orange-500/20 border border-orange-300/30 rounded-lg p-3 flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-white" />
+              <p className="text-white text-sm">
+                <span className="font-semibold">{glAnalytics.unmappedTransactions}</span> transactions need GL mapping
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Financial Overview Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -451,7 +532,7 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <span className="font-medium text-gray-900 ml-4">
-                  ${category.amount.toLocaleString()}
+                  ₦{category.amount.toLocaleString()}
                 </span>
               </div>
             ))}
@@ -483,7 +564,7 @@ const Dashboard = () => {
                   </div>
                   <div className="text-right">
                     <span className="text-sm font-medium text-gray-900">
-                      ${dept.amount.toLocaleString()}
+                      ₦{dept.amount.toLocaleString()}
                     </span>
                     <span className="text-xs text-gray-500 block">
                       {dept.transactions} transactions
@@ -576,7 +657,7 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <div className="text-right mr-3">
-                  <p className="font-medium text-gray-900">${transaction.amount}</p>
+                  <p className="font-medium text-gray-900">₦{transaction.amount}</p>
                   <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(transaction.status)}`}>
                     {getStatusIcon(transaction.status)}
                     <span className="ml-1 capitalize">{transaction.status}</span>
@@ -609,7 +690,7 @@ const Dashboard = () => {
                     <p className="text-sm text-gray-500">{item.category}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-gray-900">${item.amount}</p>
+                    <p className="font-bold text-gray-900">₦{item.amount}</p>
                     <p className="text-xs text-gray-500">{item.daysWaiting} days waiting</p>
                   </div>
                 </div>

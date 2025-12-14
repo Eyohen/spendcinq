@@ -10,7 +10,8 @@ import {
   Users,
   Receipt,
   DollarSign,
-  User
+  User,
+  BookOpen
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -27,6 +28,7 @@ const Sidebar = () => {
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/dashboard/transactions', label: 'Transactions', icon: Receipt },
     { path: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
+    { path: '/dashboard/general-ledger', label: 'General Ledger', icon: BookOpen },
     { path: '/dashboard/employees', label: 'Employees', icon: Users },
     { path: '/dashboard/billing', label: 'Billing', icon: CreditCard },
     { path: '/dashboard/settings', label: 'Settings', icon: Settings },
